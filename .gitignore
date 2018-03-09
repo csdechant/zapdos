@@ -190,3 +190,5 @@ problems/Pictures
 
 .failed_tests
 build
+
+*.pos
