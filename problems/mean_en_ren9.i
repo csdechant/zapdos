@@ -78,7 +78,8 @@ dom1Scale=1e-7
   # petsc_options_iname = '-snes_type'
   # petsc_options_value = 'test'
  nl_rel_tol = 1e-4
- nl_abs_tol = 7.6e-5
+ #nl_abs_tol = 7.6e-5 #original
+ nl_abs_tol = 5.4e-5
   dtmin = 1e-12
   l_max_its = 20
   [./TimeStepper]
@@ -96,11 +97,11 @@ dom1Scale=1e-7
   print_linear_residuals = false
   [./out]
     type = Exodus
-    execute_on  = 'final'
+    execute_on = final
   [../]
   [./dof_map]
-  type = DOFMap
-[../]
+    type = DOFMap
+  [../]
 []
 
 [Debug]
@@ -651,28 +652,28 @@ dom1Scale=1e-7
     block = 1
   [../]
   [./em_lin]
-    type = Density
+    type = DensityMoles
     convert_moles = true
     variable = em_lin
     density_log = em
     block = 0
   [../]
   [./emliq_lin]
-    type = Density
+    type = DensityMoles
     convert_moles = true
     variable = emliq_lin
     density_log = emliq
     block = 1
   [../]
   [./Arp_lin]
-    type = Density
+    type = DensityMoles
     convert_moles = true
     variable = Arp_lin
     density_log = Arp
     block = 0
   [../]
   [./OHm_lin]
-    type = Density
+    type = DensityMoles
     convert_moles = true
     variable = OHm_lin
     density_log = OHm
@@ -817,7 +818,8 @@ dom1Scale=1e-7
     potential = potential
     ip = Arp
     mean_en = mean_en
-    r = 0.999
+    #r = 0.99 #original
+    r = 0.99
     position_units = ${dom0Scale}
   [../]
   # [./em_physical_right]
@@ -849,7 +851,8 @@ dom1Scale=1e-7
     potential = potential
     em = em
     ip = Arp
-    r = 0
+    #r = 0.99 #original
+    r = 0.9
     position_units = ${dom0Scale}
   [../]
   [./em_physical_left]
@@ -917,7 +920,8 @@ dom1Scale=1e-7
   [./em_ic]
     type = ConstantIC
     variable = em
-    value = -21
+    #value = -21 #original
+    value = -26
     block = 0
   [../]
   [./emliq_ic]
@@ -929,13 +933,15 @@ dom1Scale=1e-7
   [./Arp_ic]
     type = ConstantIC
     variable = Arp
-    value = -21
+    #value = -21 #original
+    value = -26
     block = 0
   [../]
   [./mean_en_ic]
     type = ConstantIC
     variable = mean_en
-    value = -20
+    #value = -20 #original
+    value = -25
     block = 0
   [../]
   # [./potential_ic]
@@ -1007,7 +1013,8 @@ dom1Scale=1e-7
     potential = potential
     ip = Arp
     mean_en = mean_en
-    user_se_coeff = .05
+    #user_se_coeff = .05 #original
+    user_se_coeff = .15
     block = 0
     property_tables_file = td_argon_mean_en.txt
  [../]
