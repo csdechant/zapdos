@@ -18,6 +18,9 @@ protected:
   virtual Real computeQpResidual();
   virtual Real computeQpJacobian();
 
+  //adding
+  Real _time_units;
+  
   Real _r_units;
   Real _r;
 
