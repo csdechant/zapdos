@@ -44,6 +44,10 @@ protected:
   bool _ramp_trans_coeffs;
   std::string _potential_units;
   Real _voltage_scaling;
+
+  //adding
+  Real _time_units;
+
   Real _user_se_coeff;
   Real _user_work_function;
   Real _user_field_enhancement;
