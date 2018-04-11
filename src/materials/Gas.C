@@ -23,6 +23,10 @@ validParams<Gas>()
                                 "from the electron energy dependence of the "
                                 "transport coefficients.");
   params.addRequiredParam<std::string>("potential_units", "The potential units.");
+
+  //adding
+  params.addRequiredParam<Real>("time_units", "Units of time.");
+
   params.addRequiredParam<bool>("use_moles",
                                 "Whether to use units of moles as opposed to # of molecules.");
   params.addRequiredParam<FileName>(
@@ -52,6 +56,10 @@ Gas::Gas(const InputParameters & parameters)
     _interp_elastic_coeff(getParam<bool>("interp_elastic_coeff")),
     _ramp_trans_coeffs(getParam<bool>("ramp_trans_coeffs")),
     _potential_units(getParam<std::string>("potential_units")),
+
+    //adding
+    _time_units(getParam<Real>("time_units")),
+
     _user_se_coeff(getParam<Real>("user_se_coeff")),
     _user_work_function(getParam<Real>("user_work_function")),
     _user_field_enhancement(getParam<Real>("user_field_enhancement")),
@@ -246,43 +254,43 @@ Gas::computeQpProperties()
       _muem[_qp] =
           (std::tanh(_t / 1e-6) * _mu_interpolation.sample(std::exp(_mean_en[_qp] - _em[_qp])) +
            (1. - std::tanh(_t / 1e-6)) * .0352) *
-          _voltage_scaling;
+          _voltage_scaling * _time_units;
       _d_muem_d_actual_mean_en[_qp] =
           std::tanh(_t / 1e-6) *
-          _mu_interpolation.sampleDerivative(std::exp(_mean_en[_qp] - _em[_qp])) * _voltage_scaling;
+          _mu_interpolation.sampleDerivative(std::exp(_mean_en[_qp] - _em[_qp])) * _voltage_scaling * _time_units;
       _diffem[_qp] =
-          std::tanh(_t / 1e-6) * _diff_interpolation.sample(std::exp(_mean_en[_qp] - _em[_qp])) +
-          (1. - std::tanh(_t / 1e-6)) * .30;
+          (std::tanh(_t / 1e-6) * _diff_interpolation.sample(std::exp(_mean_en[_qp] - _em[_qp])) +
+          (1. - std::tanh(_t / 1e-6)) * .30) * _time_units;
       _d_diffem_d_actual_mean_en[_qp] =
           std::tanh(_t / 1e-6) *
-          _diff_interpolation.sampleDerivative(std::exp(_mean_en[_qp] - _em[_qp]));
+          _diff_interpolation.sampleDerivative(std::exp(_mean_en[_qp] - _em[_qp])) * _time_units;
     }
     else
     {
-      _muem[_qp] = _mu_interpolation.sample(std::exp(_mean_en[_qp] - _em[_qp])) * _voltage_scaling;
+      _muem[_qp] = _mu_interpolation.sample(std::exp(_mean_en[_qp] - _em[_qp])) * _voltage_scaling * _time_units;
       _d_muem_d_actual_mean_en[_qp] =
-          _mu_interpolation.sampleDerivative(std::exp(_mean_en[_qp] - _em[_qp])) * _voltage_scaling;
-      _diffem[_qp] = _diff_interpolation.sample(std::exp(_mean_en[_qp] - _em[_qp]));
+          _mu_interpolation.sampleDerivative(std::exp(_mean_en[_qp] - _em[_qp])) * _voltage_scaling * _time_units;
+      _diffem[_qp] = _diff_interpolation.sample(std::exp(_mean_en[_qp] - _em[_qp])) * _time_units;
       _d_diffem_d_actual_mean_en[_qp] =
-          _diff_interpolation.sampleDerivative(std::exp(_mean_en[_qp] - _em[_qp]));
+          _diff_interpolation.sampleDerivative(std::exp(_mean_en[_qp] - _em[_qp])) * _time_units;
     }
   }
   else
   {
     // From bolos at atmospheric pressure and an EField of 2e5 V/m
     _muem[_qp] =
-        0.0352103411399 * _voltage_scaling; // units of m^2/(kV*s) if _voltage_scaling = 1000
+        0.0352103411399 * _voltage_scaling * _time_units; // units of m^2/(kV*s) if _voltage_scaling = 1000
     _d_muem_d_actual_mean_en[_qp] = 0.0;
-    _diffem[_qp] = 0.297951680159;
+    _diffem[_qp] = 0.297951680159 * _time_units;
     _d_diffem_d_actual_mean_en[_qp] = 0.0;
   }
 
   // From Richards and Sawin, muArp*pressure = 1444 cm^2*Torr/(V*s) and diffArp*pressure = 40
   // cm^2*Torr/s. Use pressure = 760 torr.
   _muArp[_qp] =
-      1444. * _voltage_scaling /
+      1444. * _voltage_scaling * _time_units /
       (10000. * 760. * _p_gas[_qp] / 1.01E5); // units of m^2/(kV*s) if _voltage_scaling = 1000
-  _diffArp[_qp] = 0.004 / (760. * _p_gas[_qp] / 1.01E5); // covert to m^2 and include press
+  _diffArp[_qp] = 0.004 * _time_units / (760. * _p_gas[_qp] / 1.01E5); // covert to m^2 and include press
 
   // 100 times less than electrons
   // _muArp[_qp] = 3.52e-4;
