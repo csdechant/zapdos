@@ -9,11 +9,18 @@ validParams<HagelaarElectronBC>()
   params.addRequiredCoupledVar("potential", "The electric potential");
   params.addRequiredCoupledVar("mean_en", "The mean energy.");
   params.addRequiredParam<Real>("position_units", "Units of position.");
+
+  //adding
+  params.addRequiredParam<Real>("time_units", "Units of time.");
+
   return params;
 }
 
 HagelaarElectronBC::HagelaarElectronBC(const InputParameters & parameters)
   : IntegratedBC(parameters),
+
+    //adding
+    _time_units(getParam<Real>("time_units")),
 
     _r_units(1. / getParam<Real>("position_units")),
     _r(getParam<Real>("r")),
@@ -49,7 +56,7 @@ HagelaarElectronBC::computeQpResidual()
   }
 
   _v_thermal =
-      std::sqrt(8 * _e[_qp] * 2.0 / 3 * std::exp(_mean_en[_qp] - _u[_qp]) / (M_PI * _massem[_qp]));
+      (std::sqrt(8 * _e[_qp] * 2.0 / 3 * std::exp(_mean_en[_qp] - _u[_qp]) / (M_PI * _massem[_qp]))) * _time_units;
 
   return _test[_i][_qp] * _r_units * (1. - _r) / (1. + _r) *
          (-(2 * _a - 1) * _muem[_qp] * -_grad_potential[_qp] * _r_units * std::exp(_u[_qp]) *
@@ -71,7 +78,7 @@ HagelaarElectronBC::computeQpJacobian()
 
   _actual_mean_en = std::exp(_mean_en[_qp] - _u[_qp]);
   _v_thermal =
-      std::sqrt(8 * _e[_qp] * 2.0 / 3 * std::exp(_mean_en[_qp] - _u[_qp]) / (M_PI * _massem[_qp]));
+      (std::sqrt(8 * _e[_qp] * 2.0 / 3 * std::exp(_mean_en[_qp] - _u[_qp]) / (M_PI * _massem[_qp]))) * _time_units;
   _d_v_thermal_d_u = 0.5 / _v_thermal * 8 * _e[_qp] * 2.0 / 3 * std::exp(_mean_en[_qp] - _u[_qp]) /
                      (M_PI * _massem[_qp]) * -_phi[_j][_qp];
 
@@ -94,8 +101,8 @@ HagelaarElectronBC::computeQpOffDiagJacobian(unsigned int jvar)
     else
       _a = 0.0;
 
-    _v_thermal = std::sqrt(8 * _e[_qp] * 2.0 / 3 * std::exp(_mean_en[_qp] - _u[_qp]) /
-                           (M_PI * _massem[_qp]));
+    _v_thermal = (std::sqrt(8 * _e[_qp] * 2.0 / 3 * std::exp(_mean_en[_qp] - _u[_qp]) /
+                           (M_PI * _massem[_qp]))) * _time_units;
 
     return _test[_i][_qp] * _r_units * (1. - _r) / (1. + _r) *
            (-(2 * _a - 1) * _muem[_qp] * -_grad_phi[_j][_qp] * _r_units * std::exp(_u[_qp]) *
@@ -113,8 +120,8 @@ HagelaarElectronBC::computeQpOffDiagJacobian(unsigned int jvar)
       _a = 0.0;
     }
 
-    _v_thermal = std::sqrt(8 * _e[_qp] * 2.0 / 3 * std::exp(_mean_en[_qp] - _u[_qp]) /
-                           (M_PI * _massem[_qp]));
+    _v_thermal = (std::sqrt(8 * _e[_qp] * 2.0 / 3 * std::exp(_mean_en[_qp] - _u[_qp]) /
+                           (M_PI * _massem[_qp]))) * _time_units;
     _d_v_thermal_d_mean_en = 0.5 / _v_thermal * 8 * _e[_qp] * 2.0 / 3 *
                              std::exp(_mean_en[_qp] - _u[_qp]) / (M_PI * _massem[_qp]) *
                              _phi[_j][_qp];
