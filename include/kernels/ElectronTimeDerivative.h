@@ -35,7 +35,7 @@ protected:
   virtual Real computeQpJacobian();
   /* virtual Real computeQpOffDiagJacobian(unsigned int jvar); */
 
-  //Adding a time scaling to the kernel
+  //adding
   Real _time_units;
 
   bool _lumping;
