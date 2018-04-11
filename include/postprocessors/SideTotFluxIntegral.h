@@ -26,6 +26,9 @@ protected:
   std::string _mobility;
   const MaterialProperty<Real> & _mobility_coef;
 
+  //adding
+  Real _time_units;
+  
   Real _r_units;
   Real _r;
   const MaterialProperty<Real> & _kb;
