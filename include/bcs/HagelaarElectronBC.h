@@ -18,6 +18,9 @@ protected:
   virtual Real computeQpJacobian();
   virtual Real computeQpOffDiagJacobian(unsigned int jvar);
 
+  //adding
+  Real _time_units;
+  
   Real _r_units;
   Real _r;
 
