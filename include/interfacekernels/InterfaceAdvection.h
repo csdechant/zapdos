@@ -39,6 +39,8 @@ protected:
   Real _r_units;
   Real _r_neighbor_units;
 
+  Real _time_neighbor_units;
+
   MooseVariable & _potential_neighbor_var;
   const VariableGradient & _grad_potential_neighbor;
   unsigned int _potential_neighbor_id;
