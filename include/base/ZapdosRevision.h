@@ -3,7 +3,7 @@
 #ifndef ZAPDOS_REVISION_H
 #define ZAPDOS_REVISION_H
 
-#define ZAPDOS_REVISION "derived from v0.1.0, git commit 4080bce on 2018-02-18"
-#define ZAPDOS_VERSION "v0.1.0-28-g4080bce"
+#define ZAPDOS_REVISION "derived from v0.1.0, git commit d829cd7 on 2018-10-29"
+#define ZAPDOS_VERSION "v0.1.0-29-gd829cd7"
 
 #endif // ZAPDOS_REVISION_H
