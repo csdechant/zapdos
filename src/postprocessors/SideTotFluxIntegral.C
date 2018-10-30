@@ -16,10 +16,14 @@ validParams<SideTotFluxIntegral>()
   params.addRequiredCoupledVar("potential", "The potential that drives the advective flux.");
   params.addRequiredParam<Real>("r", "The reflection coefficient");
   params.addRequiredParam<Real>("position_units", "Units of position.");
+<<<<<<< HEAD
+  params.addRequiredParam<Real>("time_units", "Units of time.");
+=======
 
   //adding
   params.addRequiredParam<Real>("time_units", "Units of time.");
 
+>>>>>>> origin/2d
   params.addParam<Real>(
       "user_velocity", -1., "Optional parameter if user wants to specify the thermal velocity");
   return params;
@@ -31,10 +35,14 @@ SideTotFluxIntegral::SideTotFluxIntegral(const InputParameters & parameters)
     // _diffusion_coef(getMaterialProperty<Real>(_diffusivity)),
     _mobility(parameters.get<std::string>("mobility")),
     _mobility_coef(getMaterialProperty<Real>(_mobility)),
+<<<<<<< HEAD
+    _time_units(getParam<Real>("time_units")),
+=======
 
     //adding
     _time_units(getParam<Real>("time_units")),
 
+>>>>>>> origin/2d
     _r_units(1. / getParam<Real>("position_units")),
     _r(getParam<Real>("r")),
 
@@ -69,7 +77,7 @@ SideTotFluxIntegral::computeQpIntegral()
   // return -_mobility_coef[_qp] * _grad_potential[_qp] * _normals[_qp] * std::exp(_u[_qp])
   // -_diffusion_coef[_qp] * std::exp(_u[_qp]) * _grad_u[_qp] * _normals[_qp];
 
-  return (1. - _r) / (1. + _r) * 0.5 * _v_thermal * std::exp(_u[_qp]) +
+  return (1. - _r) / (1. + _r) * 0.5 * _v_thermal * _time_units * std::exp(_u[_qp]) +
          (1. - _r) / (1. + _r) *
              ((2 * _a - 1) * _sgn[_qp] * (_mobility_coef[_qp] / _time_units) * -_grad_potential[_qp] * _r_units *
               std::exp(_u[_qp]) * _normals[_qp]);

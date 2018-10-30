@@ -1,9 +1,9 @@
-#include "Gas.h"
+#include "Gas_Helium.h"
 #include "MooseUtils.h"
 
 template <>
 InputParameters
-validParams<Gas>()
+validParams<Gas_Helium>()
 {
   InputParameters params = validParams<Material>();
 
@@ -23,10 +23,6 @@ validParams<Gas>()
                                 "from the electron energy dependence of the "
                                 "transport coefficients.");
   params.addRequiredParam<std::string>("potential_units", "The potential units.");
-
-  //adding
-  params.addRequiredParam<Real>("time_units", "Units of time.");
-
   params.addRequiredParam<bool>("use_moles",
                                 "Whether to use units of moles as opposed to # of molecules.");
   params.addRequiredParam<FileName>(
@@ -41,7 +37,7 @@ validParams<Gas>()
   params.addParam<Real>("user_cathode_temperature", 300, "The cathode temperature in Kelvin.");
 
   params.addParam<Real>("user_T_gas", 300, "The gas temperature in Kelvin.");
-  params.addParam<Real>("user_p_gas", 1.01e5, "The gas pressure in Pascals.");
+  params.addCoupledVar("user_p_gas", "The gas pressure in Pascals.");
 
   params.addCoupledVar("potential", "The potential for calculating the electron velocity");
   params.addCoupledVar("em", "Species concentration needed to calculate the poisson source");
@@ -50,21 +46,14 @@ validParams<Gas>()
   return params;
 }
 
-Gas::Gas(const InputParameters & parameters)
+Gas_Helium::Gas_Helium(const InputParameters & parameters)
   : Material(parameters),
     // _townsend(getParam<bool>("townsend")),
     _interp_trans_coeffs(getParam<bool>("interp_trans_coeffs")),
     _interp_elastic_coeff(getParam<bool>("interp_elastic_coeff")),
     _ramp_trans_coeffs(getParam<bool>("ramp_trans_coeffs")),
     _potential_units(getParam<std::string>("potential_units")),
-<<<<<<< HEAD
     _time_units(getParam<Real>("time_units")),
-=======
-
-    //adding
-    _time_units(getParam<Real>("time_units")),
-
->>>>>>> origin/2d
     _user_se_coeff(getParam<Real>("user_se_coeff")),
     _user_work_function(getParam<Real>("user_work_function")),
     _user_field_enhancement(getParam<Real>("user_field_enhancement")),
@@ -73,7 +62,9 @@ Gas::Gas(const InputParameters & parameters)
     _user_cathode_temperature(getParam<Real>("user_cathode_temperature")),
 
     _user_T_gas(getParam<Real>("user_T_gas")),
-    _user_p_gas(getParam<Real>("user_p_gas")),
+    //_user_p_gas(getParam<Real>("user_p_gas")),
+    //_user_T_gas(isCoupled("user_T_gas") ? coupledValue("user_T_gas") : _zero),
+    _user_p_gas(coupledValue("user_p_gas")),
     _use_moles(getParam<bool>("use_moles")),
 
     _muem(declareProperty<Real>("muem")),
@@ -172,9 +163,9 @@ Gas::Gas(const InputParameters & parameters)
     _voltage_scaling = 1000;
 
   std::vector<Real> actual_mean_energy;
-  std::vector<Real> alpha;
-  std::vector<Real> alphaEx;
-  std::vector<Real> alphaEl;
+  //std::vector<Real> alpha;
+  //std::vector<Real> alphaEx;
+  //std::vector<Real> alphaEl;
   std::vector<Real> mu;
   std::vector<Real> diff;
   // std::vector<Real> d_alpha_d_actual_mean_energy;
@@ -190,12 +181,12 @@ Gas::Gas(const InputParameters & parameters)
     while (myfile >> value)
     {
       actual_mean_energy.push_back(value);
-      myfile >> value;
-      alpha.push_back(value);
-      myfile >> value;
-      alphaEx.push_back(value);
-      myfile >> value;
-      alphaEl.push_back(value);
+      //myfile >> value;
+      //alpha.push_back(value);
+      //myfile >> value;
+      //alphaEx.push_back(value);
+      //myfile >> value;
+      //alphaEl.push_back(value);
       myfile >> value;
       mu.push_back(value);
       myfile >> value;
@@ -207,21 +198,21 @@ Gas::Gas(const InputParameters & parameters)
   else
     mooseError("Unable to open file");
 
-  _alpha_interpolation.setData(actual_mean_energy, alpha);
-  _alphaEx_interpolation.setData(actual_mean_energy, alphaEx);
-  _alphaEl_interpolation.setData(actual_mean_energy, alphaEl);
+  //_alpha_interpolation.setData(actual_mean_energy, alpha);
+  //_alphaEx_interpolation.setData(actual_mean_energy, alphaEx);
+  //_alphaEl_interpolation.setData(actual_mean_energy, alphaEl);
   _mu_interpolation.setData(actual_mean_energy, mu);
   _diff_interpolation.setData(actual_mean_energy, diff);
 }
 
 void
-Gas::computeQpProperties()
+Gas_Helium::computeQpProperties()
 {
   _massem[_qp] = 9.11e-31;
-  _massGas[_qp] = 40.0 * 1.66e-27;
-  _massArp[_qp] = 40.0 * 1.66e-27;
+  _massGas[_qp] = 4.0 * 1.66e-27;
+  //_massArp[_qp] = 4.0 * 1.66e-27;
   _T_gas[_qp] = _user_T_gas;
-  _p_gas[_qp] = _user_p_gas;
+  _p_gas[_qp] = _user_p_gas[_qp];
   _k_boltz[_qp] = 1.38e-23;
   _Avogadro[_qp] = 6.0221409E23;
   if (_use_moles)
@@ -242,10 +233,10 @@ Gas::computeQpProperties()
   _eps[_qp] = 8.85e-12;
   _sgnem[_qp] = -1.;
   _sgnmean_en[_qp] = -1.;
-  _sgnArp[_qp] = 1.;
+  //_sgnArp[_qp] = 1.;
   _diffpotential[_qp] = _eps[_qp];
 
-  _TArp[_qp] = 300;
+  //_TArp[_qp] = 300;
 
   // With the exception of temperature/energy (generally in eV), all properties are in standard SI
   // units unless otherwise indicated
@@ -264,13 +255,8 @@ Gas::computeQpProperties()
           std::tanh(_t / 1e-6) *
           _mu_interpolation.sampleDerivative(std::exp(_mean_en[_qp] - _em[_qp])) * _voltage_scaling * _time_units;
       _diffem[_qp] =
-<<<<<<< HEAD
           std::tanh(_t / 1e-6) * _diff_interpolation.sample(std::exp(_mean_en[_qp] - _em[_qp])) +
           (1. - std::tanh(_t / 1e-6)) * .30 * _time_units;
-=======
-          (std::tanh(_t / 1e-6) * _diff_interpolation.sample(std::exp(_mean_en[_qp] - _em[_qp])) +
-          (1. - std::tanh(_t / 1e-6)) * .30) * _time_units;
->>>>>>> origin/2d
       _d_diffem_d_actual_mean_en[_qp] =
           std::tanh(_t / 1e-6) *
           _diff_interpolation.sampleDerivative(std::exp(_mean_en[_qp] - _em[_qp])) * _time_units;
@@ -287,6 +273,8 @@ Gas::computeQpProperties()
   }
   else
   {
+
+    //Need to Change
     // From bolos at atmospheric pressure and an EField of 2e5 V/m
     _muem[_qp] =
         0.0352103411399 * _voltage_scaling * _time_units; // units of m^2/(kV*s) if _voltage_scaling = 1000
@@ -295,33 +283,37 @@ Gas::computeQpProperties()
     _d_diffem_d_actual_mean_en[_qp] = 0.0;
   }
 
-  // From Richards and Sawin, muArp*pressure = 1444 cm^2*Torr/(V*s) and diffArp*pressure = 40
-  // cm^2*Torr/s. Use pressure = 760 torr.
-  _muArp[_qp] =
-      1444. * _voltage_scaling * _time_units /
-      (10000. * 760. * _p_gas[_qp] / 1.01E5); // units of m^2/(kV*s) if _voltage_scaling = 1000
-  _diffArp[_qp] = 0.004 * _time_units / (760. * _p_gas[_qp] / 1.01E5); // covert to m^2 and include press
+  //From H.W. Ellis for He^+ at T=300, K_0=10.6 [cm^2/Vs] and k_0=mu*(p/760)*(273.15/T)
+  //Using Einstein relation for diff, where diff=(mu*k_b*T)/e
+  //_muArp[_qp] = 1.16e-3 * _voltage_scaling * _time_units;
+      //10.6 * 0.0001 * _voltage_scaling * _time_units
+      //* (300 / 273.15) * (760 / _p_gas[_qp]); // units of m^2/(kV*s) if _voltage_scaling = 1000
+  //_diffArp[_qp] = _muArp[_qp] * _k_boltz[_qp] * 300 / _e[_qp]; // covert to m^2 and include press
 
   // 100 times less than electrons
   // _muArp[_qp] = 3.52e-4;
   // _diffArp[_qp] = 2.98e-3;
 
+  //Might need to change?
   // From curve fitting with bolos
-  _iz_coeff_efield_a[_qp] = 1.43171672e-1;
-  _iz_coeff_efield_b[_qp] = 9.05925536e-1;
-  _iz_coeff_efield_c[_qp] = 3.04958892e+6;
+
+  //_iz_coeff_efield_a[_qp] = 1.43171672e-1;
+  //_iz_coeff_efield_b[_qp] = 9.05925536e-1;
+  //_iz_coeff_efield_c[_qp] = 3.04958892e+6;
 
   // if (_townsend) {
-  _iz_coeff_energy_a[_qp] = 1.52165930e+8;
-  _iz_coeff_energy_b[_qp] = -2.87277596e-1;
-  _iz_coeff_energy_c[_qp] = 5.51972192e+1;
+
+  //_iz_coeff_energy_a[_qp] = 1.52165930e+8;
+  //_iz_coeff_energy_b[_qp] = -2.87277596e-1;
+  //_iz_coeff_energy_c[_qp] = 5.51972192e+1;
+
   // }
   // else {
   //       _iz_coeff_energy_a[_qp] = 1.43878529e-11;
   //       _iz_coeff_energy_b[_qp] = -2.70610234e-1;
   //       _iz_coeff_energy_c[_qp] = 7.64727794e+1;
   // }
-
+/*
   _actual_mean_energy[_qp] = std::exp(_mean_en[_qp] - _em[_qp]);
   _alpha_iz[_qp] = _alpha_interpolation.sample(_actual_mean_energy[_qp]);
   _d_iz_d_actual_mean_en[_qp] =
@@ -342,15 +334,16 @@ Gas::computeQpProperties()
     _alpha_el[_qp] = 5e8;
     _d_el_d_actual_mean_en[_qp] = 0.0;
   }
+  */
 
-  _el_coeff_energy_a[_qp] = 1.60638169e-13;
-  _el_coeff_energy_b[_qp] = 3.17917979e-1;
-  _el_coeff_energy_c[_qp] = 4.66301096;
+  //_el_coeff_energy_a[_qp] = 1.60638169e-13;
+  //_el_coeff_energy_b[_qp] = 3.17917979e-1;
+  //_el_coeff_energy_c[_qp] = 4.66301096;
 
   _N_A[_qp] = 6.02e23;
   _Ar[_qp] = 1.01e5 / (300 * 1.38e-23);
-  _Eiz[_qp] = 15.76;
-  _Eex[_qp] = 11.5;
+  _Eiz[_qp] = 24.58;
+  _Eex[_qp] = 19.80;
 
   // From Hagelaar: The below approximations can be derived assumption Maxwell EEDF, const
   // momentum-transfer frequency, and constant kinetic pressure.
@@ -367,6 +360,7 @@ Gas::computeQpProperties()
     _d_diffmean_en_d_actual_mean_en[_qp] = 0.0;
   }
 
+  //Might needed to change
   _rate_coeff_elastic[_qp] = 1e-13;
 
   _TemVolts[_qp] = 2. / 3. * std::exp(_mean_en[_qp] - _em[_qp]);
