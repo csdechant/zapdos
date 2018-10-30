@@ -13,27 +13,14 @@ validParams<HagelaarEnergyBC>()
   params.addRequiredCoupledVar("em", "The electron density.");
   params.addRequiredCoupledVar("ip", "The ion density.");
   params.addRequiredParam<Real>("position_units", "Units of position.");
-<<<<<<< HEAD
   params.addRequiredParam<Real>("time_units", "Units of time.");
-=======
-
-  //adding
-  params.addRequiredParam<Real>("time_units", "Units of time.");
-
->>>>>>> origin/2d
   return params;
 }
 
 HagelaarEnergyBC::HagelaarEnergyBC(const InputParameters & parameters)
   : IntegratedBC(parameters),
 
-<<<<<<< HEAD
     _time_units(getParam<Real>("time_units")),
-=======
-    //adding
-    _time_units(getParam<Real>("time_units")),
-
->>>>>>> origin/2d
     _r_units(1. / getParam<Real>("position_units")),
     _r(getParam<Real>("r")),
 
