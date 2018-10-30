@@ -12,29 +12,29 @@
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
 
-#ifndef LOGSTABILIZATIONMOLES_H
-#define LOGSTABILIZATIONMOLES_H
+#ifndef REACTANTFIRSTORDERRXN2SPECIES_H
+#define REACTANTFIRSTORDERRXN2SPECIES_H
 
 #include "Kernel.h"
 
-class LogStabilizationMoles;
+// Forward Declaration
+class ReactantFirstOrderRxn2Species;
 
 template <>
-InputParameters validParams<LogStabilizationMoles>();
+InputParameters validParams<ReactantFirstOrderRxn2Species>();
 
-class LogStabilizationMoles : public Kernel
+class ReactantFirstOrderRxn2Species : public Kernel
 {
 public:
-  LogStabilizationMoles(const InputParameters & parameters);
-  virtual ~LogStabilizationMoles();
+  ReactantFirstOrderRxn2Species(const InputParameters & parameters);
 
 protected:
   virtual Real computeQpResidual();
   virtual Real computeQpJacobian();
 
-  //adding
-  Real _time_units;
-  Real _offset;
+  // The reaction coefficient
+  const MaterialProperty<Real> & _reaction_coeff;
+  // const VariableValue & _em;
+  const MaterialProperty<Real> & _n_gas;
 };
-
-#endif /* LOGSTABILIZATIONMOLES_H */
+#endif // REACTANTFIRSTORDERRXN2SPECIES_H

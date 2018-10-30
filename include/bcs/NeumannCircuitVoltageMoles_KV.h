@@ -40,6 +40,11 @@ protected:
 
   /// The function being used for setting the value
   Real _r_units;
+
+  //adding
+  Real _time_units;
+  Real _charge_units;
+
   Function & _V_bat;
   const ProvideMobility & _data;
 

@@ -18,6 +18,7 @@ public:
 
 protected:
   Real _r_units;
+  Real _time_units;
 
   const VariableValue & _em;
   const VariableGradient & _grad_em;

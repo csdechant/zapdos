@@ -17,6 +17,7 @@ protected:
   virtual Real computeValue();
 
   Real _r_units;
+  Real _time_units;
 
   // Coupled variables
 

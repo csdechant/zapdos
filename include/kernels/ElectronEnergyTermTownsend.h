@@ -12,21 +12,21 @@
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
 
-#ifndef ELECTRONENERGYLOSSFROMEXCITATION_H
-#define ELECTRONENERGYLOSSFROMEXCITATION_H
+#ifndef ELECTRONENERGYTERMTOWNSEND_H
+#define ELECTRONENERGYTERMTOWNSEND_H
 
 #include "Kernel.h"
 
-class ElectronEnergyLossFromExcitation;
+class ElectronEnergyTermTownsend;
 
 template <>
-InputParameters validParams<ElectronEnergyLossFromExcitation>();
+InputParameters validParams<ElectronEnergyTermTownsend>();
 
-class ElectronEnergyLossFromExcitation : public Kernel
+class ElectronEnergyTermTownsend : public Kernel
 {
 public:
-  ElectronEnergyLossFromExcitation(const InputParameters & parameters);
-  virtual ~ElectronEnergyLossFromExcitation();
+  ElectronEnergyTermTownsend(const InputParameters & parameters);
+  virtual ~ElectronEnergyTermTownsend();
 
 protected:
   virtual Real computeQpResidual();
@@ -34,15 +34,18 @@ protected:
   virtual Real computeQpOffDiagJacobian(unsigned int jvar);
 
   Real _r_units;
-  Real _time_units;
+  bool _elastic;
+  Real _threshold_energy;
+  Real _energy_change;
 
+  const MaterialProperty<Real> & _elastic_energy;
   const MaterialProperty<Real> & _diffem;
   const MaterialProperty<Real> & _muem;
-  const MaterialProperty<Real> & _alpha_ex;
-  const MaterialProperty<Real> & _d_ex_d_actual_mean_en;
+  const MaterialProperty<Real> & _alpha;
+  const MaterialProperty<Real> & _d_iz_d_actual_mean_en;
   const MaterialProperty<Real> & _d_muem_d_actual_mean_en;
   const MaterialProperty<Real> & _d_diffem_d_actual_mean_en;
-  const MaterialProperty<Real> & _Eex;
+  // const MaterialProperty<Real> & _threshold_energy;
 
   const VariableGradient & _grad_potential;
   const VariableValue & _em;
@@ -51,4 +54,4 @@ protected:
   unsigned int _em_id;
 };
 
-#endif /* ELECTRONENERGYLOSSFROMEXCITATION_H */
+#endif /* ELECTRONENERGYTERMTOWNSEND_H */

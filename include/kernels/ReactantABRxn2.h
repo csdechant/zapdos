@@ -12,43 +12,34 @@
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
 
-#ifndef ELECTRONENERGYLOSSFROMEXCITATION_H
-#define ELECTRONENERGYLOSSFROMEXCITATION_H
+#ifndef REACTANTABRXN2_H
+#define REACTANTABRXN2_H
 
 #include "Kernel.h"
 
-class ElectronEnergyLossFromExcitation;
+// Forward Declaration
+class ReactantABRxn2;
 
 template <>
-InputParameters validParams<ElectronEnergyLossFromExcitation>();
+InputParameters validParams<ReactantABRxn2>();
 
-class ElectronEnergyLossFromExcitation : public Kernel
+class ReactantABRxn2 : public Kernel
 {
 public:
-  ElectronEnergyLossFromExcitation(const InputParameters & parameters);
-  virtual ~ElectronEnergyLossFromExcitation();
+  ReactantABRxn2(const InputParameters & parameters);
 
 protected:
   virtual Real computeQpResidual();
   virtual Real computeQpJacobian();
   virtual Real computeQpOffDiagJacobian(unsigned int jvar);
 
-  Real _r_units;
-  Real _time_units;
+  // The reaction coefficient
+  // MooseVariable & _coupled_var_A;
+  const MaterialProperty<Real> & _reaction_coeff;
+  const VariableValue & _v;
+  unsigned int _v_id;
+  const MaterialProperty<Real> & _n_gas;
+  Real _stoichiometric_coeff;
 
-  const MaterialProperty<Real> & _diffem;
-  const MaterialProperty<Real> & _muem;
-  const MaterialProperty<Real> & _alpha_ex;
-  const MaterialProperty<Real> & _d_ex_d_actual_mean_en;
-  const MaterialProperty<Real> & _d_muem_d_actual_mean_en;
-  const MaterialProperty<Real> & _d_diffem_d_actual_mean_en;
-  const MaterialProperty<Real> & _Eex;
-
-  const VariableGradient & _grad_potential;
-  const VariableValue & _em;
-  const VariableGradient & _grad_em;
-  unsigned int _potential_id;
-  unsigned int _em_id;
 };
-
-#endif /* ELECTRONENERGYLOSSFROMEXCITATION_H */
+#endif // REACTANTABRXN2_H

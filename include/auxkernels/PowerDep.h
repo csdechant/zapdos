@@ -18,6 +18,7 @@ public:
 
 protected:
   Real _r_units;
+  Real _time_units;
 
   MooseVariable & _density_var;
   const VariableValue & _density_log;

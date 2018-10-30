@@ -24,15 +24,21 @@ protected:
   virtual Real computeQpJacobian();
 
   /// The value for this BC
-  const PostprocessorValue & _current;
+  const PostprocessorValue & _ion_current;
+  const PostprocessorValue & _electron_current;
   Function & _surface_potential;
   std::string _surface;
   Real _resist;
   Real _coulomb_charge;
   Real _N_A;
   std::string _potential_units;
+  //adding
+  Real _time_units;
   Real _r_units;
   bool _convert_moles;
+  Real _charge_units;
+  Real _current;
+
   Real _A;
 
   Real _current_sign;

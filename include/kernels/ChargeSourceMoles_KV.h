@@ -30,6 +30,10 @@ protected:
   const MaterialProperty<Real> & _e;
   const MaterialProperty<Real> & _sgn;
   const MaterialProperty<Real> & _N_A;
+
+  //adding
+  Real _time_units;
+  
   std::string _potential_units;
 
   Real _voltage_scaling;
