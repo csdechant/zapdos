@@ -47,10 +47,6 @@ protected:
 
   //adding
   Real _time_units;
-<<<<<<< HEAD
-  Real _charge_units;
-=======
->>>>>>> origin/2d
 
   Real _user_se_coeff;
   Real _user_work_function;
