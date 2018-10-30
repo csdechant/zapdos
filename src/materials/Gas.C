@@ -57,14 +57,7 @@ Gas::Gas(const InputParameters & parameters)
     _interp_elastic_coeff(getParam<bool>("interp_elastic_coeff")),
     _ramp_trans_coeffs(getParam<bool>("ramp_trans_coeffs")),
     _potential_units(getParam<std::string>("potential_units")),
-<<<<<<< HEAD
     _time_units(getParam<Real>("time_units")),
-=======
-
-    //adding
-    _time_units(getParam<Real>("time_units")),
-
->>>>>>> origin/2d
     _user_se_coeff(getParam<Real>("user_se_coeff")),
     _user_work_function(getParam<Real>("user_work_function")),
     _user_field_enhancement(getParam<Real>("user_field_enhancement")),
@@ -264,13 +257,8 @@ Gas::computeQpProperties()
           std::tanh(_t / 1e-6) *
           _mu_interpolation.sampleDerivative(std::exp(_mean_en[_qp] - _em[_qp])) * _voltage_scaling * _time_units;
       _diffem[_qp] =
-<<<<<<< HEAD
           std::tanh(_t / 1e-6) * _diff_interpolation.sample(std::exp(_mean_en[_qp] - _em[_qp])) +
           (1. - std::tanh(_t / 1e-6)) * .30 * _time_units;
-=======
-          (std::tanh(_t / 1e-6) * _diff_interpolation.sample(std::exp(_mean_en[_qp] - _em[_qp])) +
-          (1. - std::tanh(_t / 1e-6)) * .30) * _time_units;
->>>>>>> origin/2d
       _d_diffem_d_actual_mean_en[_qp] =
           std::tanh(_t / 1e-6) *
           _diff_interpolation.sampleDerivative(std::exp(_mean_en[_qp] - _em[_qp])) * _time_units;
