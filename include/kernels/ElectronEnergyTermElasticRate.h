@@ -12,21 +12,21 @@
 /*            See COPYRIGHT for full restrictions               */
 /****************************************************************/
 
-#ifndef IONSFROMIONIZATION_H
-#define IONSFROMIONIZATION_H
+#ifndef ELECTRONENERGYTERMELASTICRATE_H
+#define ELECTRONENERGYTERMELASTICRATE_H
 
 #include "Kernel.h"
 
-class IonsFromIonization;
+class ElectronEnergyTermElasticRate;
 
 template <>
-InputParameters validParams<IonsFromIonization>();
+InputParameters validParams<ElectronEnergyTermElasticRate>();
 
-class IonsFromIonization : public Kernel
+class ElectronEnergyTermElasticRate : public Kernel
 {
 public:
-  IonsFromIonization(const InputParameters & parameters);
-  virtual ~IonsFromIonization();
+  ElectronEnergyTermElasticRate(const InputParameters & parameters);
+  virtual ~ElectronEnergyTermElasticRate();
 
 protected:
   virtual Real computeQpResidual();
@@ -34,22 +34,17 @@ protected:
   virtual Real computeQpOffDiagJacobian(unsigned int jvar);
 
   Real _r_units;
-  Real _time_units;
 
-  const MaterialProperty<Real> & _diffem;
-  const MaterialProperty<Real> & _muem;
-  const MaterialProperty<Real> & _alpha_iz;
+  const MaterialProperty<Real> & _rate_coefficient;
   const MaterialProperty<Real> & _d_iz_d_actual_mean_en;
-  const MaterialProperty<Real> & _d_muem_d_actual_mean_en;
-  const MaterialProperty<Real> & _d_diffem_d_actual_mean_en;
 
-  const VariableValue & _mean_en;
-  const VariableGradient & _grad_potential;
-  const VariableValue & _em;
-  const VariableGradient & _grad_em;
-  unsigned int _mean_en_id;
-  unsigned int _potential_id;
-  unsigned int _em_id;
+  const VariableValue & _electron;
+  const VariableValue & _target;
+  unsigned int _electron_id;
+  unsigned int _target_id;
+
+  const MaterialProperty<Real> & _massIncident;
+  const MaterialProperty<Real> & _massTarget;
 };
 
-#endif /* IONSFROMIONIZATION_H */
+#endif /* ELECTRONENERGYTERMELASTICRATE_H */

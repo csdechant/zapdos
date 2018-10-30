@@ -20,7 +20,11 @@ protected:
 
   //adding
   Real _time_units;
+<<<<<<< HEAD
+
+=======
   
+>>>>>>> origin/2d
   Real _r_units;
   Real _r;
 

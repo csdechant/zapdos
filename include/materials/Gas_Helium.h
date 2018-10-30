@@ -11,22 +11,22 @@
 /*                                                              */
 /*              See COPYRIGHT for full restrictions             */
 /****************************************************************/
-#ifndef GAS_H_
-#define GAS_H_
+#ifndef GAS_HELIUM_H_
+#define GAS_HELIUM_H_
 
 #include "Material.h"
 /* #include "LinearInterpolation.h" */
 #include "SplineInterpolation.h"
 
-class Gas;
+class Gas_Helium;
 
 template <>
-InputParameters validParams<Gas>();
+InputParameters validParams<Gas_Helium>();
 
-class Gas : public Material
+class Gas_Helium : public Material
 {
 public:
-  Gas(const InputParameters & parameters);
+  Gas_Helium(const InputParameters & parameters);
 
 protected:
   virtual void computeQpProperties();
@@ -47,10 +47,7 @@ protected:
 
   //adding
   Real _time_units;
-<<<<<<< HEAD
   Real _charge_units;
-=======
->>>>>>> origin/2d
 
   Real _user_se_coeff;
   Real _user_work_function;
@@ -58,9 +55,9 @@ protected:
   Real _user_Richardson_coefficient;
   Real _user_cathode_temperature;
   Real _user_T_gas;
-  Real _user_p_gas;
+  //Real _user_p_gas;
   //const VariableValue & _user_T_gas;
-  //const VariableValue & _user_p_gas;
+  const VariableValue & _user_p_gas;
   bool _use_moles;
 
   MaterialProperty<Real> & _muem;
