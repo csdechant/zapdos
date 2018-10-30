@@ -21,12 +21,14 @@ validParams<DiffusiveFlux>()
   InputParameters params = validParams<AuxKernel>();
   params.addRequiredCoupledVar("density_log", "The variable representing the log of the density.");
   params.addRequiredParam<Real>("position_units", "Units of position.");
+  params.addRequiredParam<Real>("time_units", "Units of time.");
   return params;
 }
 
 DiffusiveFlux::DiffusiveFlux(const InputParameters & parameters)
   : AuxKernel(parameters),
     _r_units(1. / getParam<Real>("position_units")),
+    _time_units(getParam<Real>("time_units")),
 
     // Coupled variables
 
@@ -43,5 +45,5 @@ DiffusiveFlux::DiffusiveFlux(const InputParameters & parameters)
 Real
 DiffusiveFlux::computeValue()
 {
-  return -_diff[_qp] * std::exp(_density_log[_qp]) * _grad_density_log[_qp](0) * _r_units * 6.02e23;
+  return -(_diff[_qp] / _time_units) * std::exp(_density_log[_qp]) * _grad_density_log[_qp](0) * _r_units * 6.02e23;
 }

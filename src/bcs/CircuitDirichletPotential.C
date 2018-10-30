@@ -7,8 +7,11 @@ validParams<CircuitDirichletPotential>()
 {
   InputParameters p = validParams<NodalBC>();
   p.addRequiredParam<PostprocessorName>(
-      "current",
-      "The postprocessor response for calculating the current passing through the needle surface.");
+      "ion_current",
+      "The postprocessor response for calculating the ion current passing through the needle surface.");
+  p.addRequiredParam<PostprocessorName>(
+      "electron_current",
+      "The postprocessor response for calculating the electron current passing through the needle surface.");
   p.addRequiredParam<FunctionName>(
       "surface_potential",
       "The electrical potential applied to the surface if no current was flowing in the circuit.");
@@ -18,6 +21,7 @@ validParams<CircuitDirichletPotential>()
                                   "other metal surface be grounded.");
   p.addRequiredParam<Real>("resist", "The ballast resistance in Ohms");
   p.addRequiredParam<Real>("position_units", "Units of position");
+  p.addRequiredParam<Real>("time_units", "Units of time");
   p.addRequiredParam<std::string>("potential_units", "The potential units.");
   p.addRequiredParam<bool>("use_moles", "Whether to convert from units of moles to #.");
   p.addParam<Real>("A",
@@ -29,15 +33,18 @@ validParams<CircuitDirichletPotential>()
 
 CircuitDirichletPotential::CircuitDirichletPotential(const InputParameters & parameters)
   : NodalBC(parameters),
-    _current(getPostprocessorValue("current")),
+    _ion_current(getPostprocessorValue("ion_current")),
+    _electron_current(getPostprocessorValue("electron_current")),
     _surface_potential(getFunction("surface_potential")),
     _surface(getParam<std::string>("surface")),
     _resist(getParam<Real>("resist")),
     _coulomb_charge(1.6e-19),
     _N_A(6.02e23),
     _potential_units(getParam<std::string>("potential_units")),
+    _time_units(getParam<Real>("time_units")),
     _r_units(1. / getParam<Real>("position_units")),
     _convert_moles(getParam<bool>("use_moles")),
+    _current(0),
     _A(getParam<Real>("A"))
 {
   if (_surface.compare("anode") == 0)
@@ -53,13 +60,16 @@ CircuitDirichletPotential::CircuitDirichletPotential(const InputParameters & par
 Real
 CircuitDirichletPotential::computeQpResidual()
 {
+
+  _current = _ion_current - _electron_current;
+
   if (_convert_moles)
     return _surface_potential.value(_t, *_current_node) - _u[_qp] +
-           _current_sign * _current / std::pow(_r_units, 2.) * _resist / _voltage_scaling *
+           _current_sign * _current / std::pow(_r_units, 2.) * _resist / (_voltage_scaling * _time_units) *
                _coulomb_charge * _A * _N_A;
   else
     return _surface_potential.value(_t, *_current_node) - _u[_qp] +
-           _current_sign * _current / std::pow(_r_units, 2.) * _resist / _voltage_scaling *
+           _current_sign * _current / std::pow(_r_units, 2.) * _resist / (_voltage_scaling * _time_units) *
                _coulomb_charge * _A;
 }
 

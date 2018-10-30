@@ -12,6 +12,7 @@ validParams<PowerDep>()
       "art_diff", false, "Whether there is a current contribution from artificial diffusion.");
   params.addRequiredParam<std::string>("potential_units", "The potential units.");
   params.addRequiredParam<Real>("position_units", "Units of position.");
+  params.addRequiredParam<Real>("time_units", "Units of time.");
   return params;
 }
 
@@ -19,6 +20,7 @@ PowerDep::PowerDep(const InputParameters & parameters)
   : AuxKernel(parameters),
 
     _r_units(1. / getParam<Real>("position_units")),
+    _time_units(getParam<Real>("time_units")),
     _density_var(*getVar("density_log", 0)),
     _density_log(coupledValue("density_log")),
     _grad_density_log(coupledGradient("density_log")),
@@ -41,12 +43,12 @@ PowerDep::computeValue()
 {
   _current =
       _sgn[_qp] * 1.6e-19 * 6.02e23 *
-      (_sgn[_qp] * _mu[_qp] * -_grad_potential[_qp] * _r_units * std::exp(_density_log[_qp]) -
-       _diff[_qp] * std::exp(_density_log[_qp]) * _grad_density_log[_qp] * _r_units);
+      (_sgn[_qp] * (_mu[_qp] / _time_units) * -_grad_potential[_qp] * _r_units * std::exp(_density_log[_qp]) -
+       (_diff[_qp] / _time_units) * std::exp(_density_log[_qp]) * _grad_density_log[_qp] * _r_units);
 
   if (_art_diff)
   {
-    Real vd_mag = _mu[_qp] * _grad_potential[_qp].norm() * _r_units;
+    Real vd_mag = (_mu[_qp] / _time_units) * _grad_potential[_qp].norm() * _r_units;
     Real delta = vd_mag * _current_elem->hmax() / 2.;
     _current += _sgn[_qp] * 1.6e-19 * 6.02e23 * -delta * std::exp(_density_log[_qp]) *
                 _grad_density_log[_qp] * _r_units;

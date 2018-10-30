@@ -13,19 +13,27 @@ validParams<SecondaryElectronBC>()
   params.addRequiredCoupledVar("mean_en", "The mean energy.");
   params.addRequiredCoupledVar("ip", "The ion density.");
   params.addRequiredParam<Real>("position_units", "Units of position.");
+<<<<<<< HEAD
+  params.addRequiredParam<Real>("time_units", "Units of time.");
+=======
 
   //adding
   params.addRequiredParam<Real>("time_units", "Units of time.");
 
+>>>>>>> origin/2d
   return params;
 }
 
 SecondaryElectronBC::SecondaryElectronBC(const InputParameters & parameters)
   : IntegratedBC(parameters),
 
+<<<<<<< HEAD
+    _time_units(getParam<Real>("time_units")),
+=======
     //adding
     _time_units(getParam<Real>("time_units")),
 
+>>>>>>> origin/2d
     _r_units(1. / getParam<Real>("position_units")),
     _r(getParam<Real>("r")),
 
@@ -83,7 +91,7 @@ SecondaryElectronBC::computeQpResidual()
   _v_thermal =
       (std::sqrt(8 * _e[_qp] * 2.0 / 3 * std::exp(_mean_en[_qp] - _u[_qp]) / (M_PI * _massem[_qp]))) * _time_units;
 
-  return _test[_i][_qp] * _r_units * (1. - _r) / (1. + _r) * (-0.5 * _v_thermal * _n_gamma) -
+  return _test[_i][_qp] * _r_units * (1. - _r) / (1. + _r) * (-0.5 * _v_thermal * _time_units * _n_gamma) -
          _test[_i][_qp] * _r_units * 2. / (1. + _r) * (1. - _a) * _se_coeff[_qp] * _ion_flux *
              _normals[_qp];
 }

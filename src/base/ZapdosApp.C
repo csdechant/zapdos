@@ -1,9 +1,10 @@
 #include "ZapdosApp.h"
 #include "Moose.h"
 #include "AppFactory.h"
+#include "ModulesApp.h"
 #include "MooseSyntax.h"
 #include "SquirrelApp.h"
-// #include "ModulesApp.h"
+#include "CraneApp.h"
 
 // Kernels
 #include "PotentialGradientSource.h"
@@ -39,6 +40,16 @@
 #include "EFieldAdvection.h"
 #include "JouleHeating.h"
 #include "ElectronTimeDerivative.h"
+#include "ElectronEnergyTermTownsend.h"
+#include "ElectronEnergyTermElasticRate.h"
+#include "ElectronEnergyTermElasticTownsend.h"
+#include "ElectronEnergyTermRate.h"
+#include "ElectronImpactReactionProduct.h"
+#include "ElectronImpactReactionReactant.h"
+#include "ProductABRxn.h"
+#include "ReactantABRxn2.h"
+#include "ProductFirstOrderRxn2Species.h"
+#include "ReactantFirstOrderRxn2Species.h"
 
 // AuxKernels
 
@@ -58,12 +69,20 @@
 #include "ElectronTemperature.h"
 #include "DiffusiveFlux.h"
 #include "Efield.h"
+#include "SurfaceCharge.h"
 
 // Materials
 #include "SigmaMat.h"
 #include "JacMat.h"
 #include "Gas.h"
+#include "Gas_Helium.h"
 #include "Water.h"
+#include "GasBase.h"
+#include "GenericEnergyDependentReactionRate.h"
+#include "GenericReactionRate.h"
+#include "HeavySpeciesMaterial.h"
+#include "ReactionNetwork.h"
+#include "GenericReaction.h"
 
 // Indicators
 #include "AnalyticalDiffIndicator.h"
@@ -96,6 +115,8 @@
 #include "NeumannCircuitVoltageMoles_KV.h"
 #include "NeumannCircuitVoltageNew.h"
 #include "DCIonBC.h"
+#include "DielectricPotentialNeumannBC.h"
+#include "EnergyBC2.h"
 
 // Actions
 
@@ -105,6 +126,7 @@
 #include "AddLotsOfTimeDerivatives.h"
 #include "AddLotsOfEFieldAdvection.h"
 #include "AddLotsOfPotentialDrivenArtificialDiff.h"
+#include "AddLotsOfTwoBodyReactions.h"
 
 // DGKernels
 #include "DGCoeffDiffusion.h"
@@ -126,6 +148,7 @@
 // Postprocessors
 
 #include "SideTotFluxIntegral.h"
+#include "SideTotElectronFlux.h"
 
 template <>
 InputParameters
@@ -143,11 +166,15 @@ ZapdosApp::ZapdosApp(InputParameters parameters) : MooseApp(parameters)
 {
 
   Moose::registerObjects(_factory);
+  ModulesApp::registerObjects(_factory);
   SquirrelApp::registerObjects(_factory);
+  CraneApp::registerObjects(_factory);
   ZapdosApp::registerObjects(_factory);
 
   Moose::associateSyntax(_syntax, _action_factory);
+  ModulesApp::associateSyntax(_syntax, _action_factory);
   SquirrelApp::associateSyntax(_syntax, _action_factory);
+  CraneApp::associateSyntax(_syntax, _action_factory);
   ZapdosApp::associateSyntax(_syntax, _action_factory);
 }
 
@@ -201,6 +228,16 @@ ZapdosApp::registerObjects(Factory & factory)
   registerKernel(LogStabilizationMoles);
   registerKernel(ProductFirstOrderRxn);
   registerKernel(ProductAABBRxn);
+  registerKernel(ElectronEnergyTermTownsend);
+  registerKernel(ElectronEnergyTermElasticRate);
+  registerKernel(ElectronEnergyTermElasticTownsend);
+  registerKernel(ElectronEnergyTermRate);
+  registerKernel(ElectronImpactReactionProduct);
+  registerKernel(ElectronImpactReactionReactant);
+  registerKernel(ProductABRxn);
+  registerKernel(ReactantABRxn2);
+  registerKernel(ReactantFirstOrderRxn2Species);
+  registerKernel(ProductFirstOrderRxn2Species);
   registerAux(Sigma);
   registerAux(DriftDiffusionFluxAux);
   registerAux(AbsValueAux);
@@ -217,10 +254,18 @@ ZapdosApp::registerObjects(Factory & factory)
   registerAux(DiffusiveFlux);
   registerAux(EFieldAdvAux);
   registerAux(UserFlux);
+  registerAux(SurfaceCharge);
   registerMaterial(SigmaMat);
   registerMaterial(JacMat);
   registerMaterial(Gas);
+  registerMaterial(Gas_Helium);
   registerMaterial(Water);
+  registerMaterial(GasBase);
+  registerMaterial(GenericEnergyDependentReactionRate);
+  registerMaterial(GenericReactionRate);
+  registerMaterial(ReactionNetwork);
+  registerMaterial(GenericReaction);
+  registerMaterial(HeavySpeciesMaterial);
   registerIndicator(AnalyticalDiffIndicator);
   registerUserObject(BlockAverageValue);
   registerUserObject(ProvideMobility);
@@ -245,6 +290,8 @@ ZapdosApp::registerObjects(Factory & factory)
   registerBoundaryCondition(HagelaarEnergyAdvectionBC);
   registerBoundaryCondition(NeumannCircuitVoltageMoles_KV);
   registerBoundaryCondition(DCIonBC);
+  registerBoundaryCondition(DielectricPotentialNeumannBC);
+  registerBoundaryCondition(EnergyBC2);
   registerInterfaceKernel(InterfaceAdvection);
   registerInterfaceKernel(HphiRadialInterface);
   registerInterfaceKernel(InterfaceLogDiffusionElectrons);
@@ -252,6 +299,7 @@ ZapdosApp::registerObjects(Factory & factory)
   registerDGKernel(DGEFieldAdvection);
   registerConstraint(ArbitrarilyTiedValueConstraint);
   registerPostprocessor(SideTotFluxIntegral);
+  registerPostprocessor(SideTotElectronFlux);
 }
 
 void
@@ -283,4 +331,9 @@ ZapdosApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
   registerAction(AddLotsOfPotentialDrivenArtificialDiff, "add_bc");
   syntax.registerActionSyntax("AddLotsOfPotentialDrivenArtificialDiff",
                               "LotsOfPotentialDrivenArtificialDiff");
+  registerAction(AddLotsOfTwoBodyReactions, "add_variable");
+  registerAction(AddLotsOfTwoBodyReactions, "add_kernel");
+  registerAction(AddLotsOfTwoBodyReactions, "add_bc");
+  syntax.registerActionSyntax("AddLotsOfTwoBodyReactions",
+                              "LotsOfTwoBodyReactions");
 }

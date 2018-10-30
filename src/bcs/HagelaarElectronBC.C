@@ -9,19 +9,27 @@ validParams<HagelaarElectronBC>()
   params.addRequiredCoupledVar("potential", "The electric potential");
   params.addRequiredCoupledVar("mean_en", "The mean energy.");
   params.addRequiredParam<Real>("position_units", "Units of position.");
+<<<<<<< HEAD
+  params.addRequiredParam<Real>("time_units", "Units of time.");
+=======
 
   //adding
   params.addRequiredParam<Real>("time_units", "Units of time.");
 
+>>>>>>> origin/2d
   return params;
 }
 
 HagelaarElectronBC::HagelaarElectronBC(const InputParameters & parameters)
   : IntegratedBC(parameters),
 
+<<<<<<< HEAD
+    _time_units(getParam<Real>("time_units")),
+=======
     //adding
     _time_units(getParam<Real>("time_units")),
 
+>>>>>>> origin/2d
     _r_units(1. / getParam<Real>("position_units")),
     _r(getParam<Real>("r")),
 
@@ -61,7 +69,7 @@ HagelaarElectronBC::computeQpResidual()
   return _test[_i][_qp] * _r_units * (1. - _r) / (1. + _r) *
          (-(2 * _a - 1) * _muem[_qp] * -_grad_potential[_qp] * _r_units * std::exp(_u[_qp]) *
               _normals[_qp] +
-          0.5 * _v_thermal * std::exp(_u[_qp]));
+          0.5 * _v_thermal * _time_units * std::exp(_u[_qp]));
 }
 
 Real
@@ -87,8 +95,8 @@ HagelaarElectronBC::computeQpJacobian()
               _phi[_j][_qp] * _normals[_qp] -
           (2. * _a - 1.) * _d_muem_d_actual_mean_en[_qp] * _actual_mean_en * -_phi[_j][_qp] *
               -_grad_potential[_qp] * _r_units * std::exp(_u[_qp]) * _normals[_qp] +
-          0.5 * _d_v_thermal_d_u * std::exp(_u[_qp]) +
-          0.5 * _v_thermal * std::exp(_u[_qp]) * _phi[_j][_qp]);
+          0.5 * _d_v_thermal_d_u * _time_units * std::exp(_u[_qp]) +
+          0.5 * _v_thermal * _time_units * std::exp(_u[_qp]) * _phi[_j][_qp]);
 }
 
 Real
@@ -130,7 +138,7 @@ HagelaarElectronBC::computeQpOffDiagJacobian(unsigned int jvar)
     return _test[_i][_qp] * _r_units * (1. - _r) / (1. + _r) *
            (-(2 * _a - 1) * _d_muem_d_actual_mean_en[_qp] * _actual_mean_en * _phi[_j][_qp] *
                 -_grad_potential[_qp] * _r_units * std::exp(_u[_qp]) * _normals[_qp] +
-            0.5 * _d_v_thermal_d_mean_en * std::exp(_u[_qp]));
+            0.5 * _d_v_thermal_d_mean_en * _time_units * std::exp(_u[_qp]));
   }
 
   else

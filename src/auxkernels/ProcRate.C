@@ -12,6 +12,7 @@ validParams<ProcRate>()
       "proc",
       "The process that we want to get the townsend coefficient for. Options are iz, ex, and el.");
   params.addRequiredParam<Real>("position_units", "Units of position.");
+  params.addRequiredParam<Real>("time_units", "Units of time.");
   return params;
 }
 
@@ -19,6 +20,7 @@ ProcRate::ProcRate(const InputParameters & parameters)
   : AuxKernel(parameters),
 
     _r_units(1. / getParam<Real>("position_units")),
+    _time_units(getParam<Real>("time_units")),
     _em(coupledValue("em")),
     _grad_em(coupledGradient("em")),
     _grad_potential(coupledGradient("potential")),
@@ -34,8 +36,8 @@ Real
 ProcRate::computeValue()
 {
   _em_current =
-      6.02e23 * (_sgnem[_qp] * _muem[_qp] * -_grad_potential[_qp] * _r_units * std::exp(_em[_qp]) -
-                 _diffem[_qp] * std::exp(_em[_qp]) * _grad_em[_qp] * _r_units);
+      6.02e23 * (_sgnem[_qp] * (_muem[_qp] / _time_units) * -_grad_potential[_qp] * _r_units * std::exp(_em[_qp]) -
+                 (_diffem[_qp] / _time_units) * std::exp(_em[_qp]) * _grad_em[_qp] * _r_units);
 
   return _alpha[_qp] * _em_current.norm();
 }
