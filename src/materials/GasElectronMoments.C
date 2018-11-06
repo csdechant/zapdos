@@ -1,9 +1,9 @@
-#include "Gas_Helium.h"
+#include "GasElectronMoments.h"
 #include "MooseUtils.h"
 
 template <>
 InputParameters
-validParams<Gas_Helium>()
+validParams<GasElectronMoments>()
 {
   InputParameters params = validParams<Material>();
 
@@ -46,7 +46,7 @@ validParams<Gas_Helium>()
   return params;
 }
 
-Gas_Helium::Gas_Helium(const InputParameters & parameters)
+GasElectronMoments::GasElectronMoments(const InputParameters & parameters)
   : Material(parameters),
     // _townsend(getParam<bool>("townsend")),
     _interp_trans_coeffs(getParam<bool>("interp_trans_coeffs")),
@@ -206,7 +206,7 @@ Gas_Helium::Gas_Helium(const InputParameters & parameters)
 }
 
 void
-Gas_Helium::computeQpProperties()
+GasElectronMoments::computeQpProperties()
 {
   _massem[_qp] = 9.11e-31;
   _massGas[_qp] = 4.0 * 1.66e-27;
