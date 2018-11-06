@@ -28,7 +28,7 @@ validParams<GasElectronMoments>()
   params.addRequiredParam<FileName>(
       "property_tables_file", "The file containing interpolation tables for material properties.");
 
-  params.addRequiredParam<Real>("time_units", 1, "Units of time");
+  params.addParam<Real>("time_units", 1, "Units of time");
   params.addParam<Real>("user_se_coeff", 0.15, "The secondary electron emission coefficient.");
   params.addParam<Real>("user_work_function", 5.00, "The work function.");
   params.addParam<Real>("user_field_enhancement", 1, "The field enhancement factor.");
