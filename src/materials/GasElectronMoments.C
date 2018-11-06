@@ -1,6 +1,8 @@
 #include "GasElectronMoments.h"
 #include "MooseUtils.h"
 
+registerMooseObject("ZapdosApp", GasElectronMoments);
+
 template <>
 InputParameters
 validParams<GasElectronMoments>()
