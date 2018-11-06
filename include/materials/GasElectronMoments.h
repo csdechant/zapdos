@@ -11,22 +11,22 @@
 /*                                                              */
 /*              See COPYRIGHT for full restrictions             */
 /****************************************************************/
-#ifndef GAS_HELIUM_H_
-#define GAS_HELIUM_H_
+#ifndef GASELECTRONMOMENTS_H_
+#define GASELECTRONMOMENTS_H_
 
 #include "Material.h"
 /* #include "LinearInterpolation.h" */
 #include "SplineInterpolation.h"
 
-class Gas_Helium;
+class GasElectronMoments;
 
 template <>
-InputParameters validParams<Gas_Helium>();
+InputParameters validParams<GasElectronMoments>();
 
-class Gas_Helium : public Material
+class GasElectronMoments : public Material
 {
 public:
-  Gas_Helium(const InputParameters & parameters);
+  GasElectronMoments(const InputParameters & parameters);
 
 protected:
   virtual void computeQpProperties();
@@ -148,4 +148,4 @@ protected:
   const VariableValue & _mean_en;
 };
 
-#endif // GAS_H
+#endif // GASELECTRONMOMENTS_H_
