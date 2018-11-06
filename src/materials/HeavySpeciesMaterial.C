@@ -16,7 +16,7 @@ validParams<HeavySpeciesMaterial>()
   params.addRequiredParam<Real>("heavy_species_mass", "Mass of the heavy species");
   params.addRequiredParam<std::string>("potential_units", "The potential units.");
   params.addRequiredParam<Real>("heavy_species_charge", "Charge of heavy species.");
-  params.addRequiredParam<Real>("time_units", 1, "Units of time");
+  params.addParam<Real>("time_units", 1, "Units of time");
   params.addParam<Real>("mobility", "The species mobility (if applicable).");
   params.addParam<Real>("diffusivity", "The species diffusivity (if applicable).");
   // params.addRequiredParam<FileName>(
