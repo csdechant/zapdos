@@ -3,6 +3,9 @@
 #include "AppFactory.h"
 #include "MooseSyntax.h"
 #include "SquirrelApp.h"
+#include "ModulesApp.h"
+#include "CraneApp.h"
+
 
 template <>
 InputParameters
@@ -24,11 +27,15 @@ ZapdosApp::ZapdosApp(InputParameters parameters) : MooseApp(parameters)
 {
 
   Moose::registerObjects(_factory);
+  ModulesApp::registerObjects(_factory);
   SquirrelApp::registerObjects(_factory);
+  CraneApp::registerObjects(_factory);
   ZapdosApp::registerObjects(_factory);
 
   Moose::associateSyntax(_syntax, _action_factory);
+  ModulesApp::associateSyntax(_syntax, _action_factory);
   SquirrelApp::associateSyntax(_syntax, _action_factory);
+  CraneApp::associateSyntax(_syntax, _action_factory);
   ZapdosApp::associateSyntax(_syntax, _action_factory);
 }
 
