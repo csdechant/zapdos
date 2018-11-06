@@ -39,12 +39,6 @@ APPLICATION_DIR    := $(SQUIRREL_DIR)
 APPLICATION_NAME   := squirrel
 include            $(FRAMEWORK_DIR)/app.mk
 
-# dep apps
-APPLICATION_DIR    := $(CURDIR)
-APPLICATION_NAME   := zapdos
-BUILD_EXEC         := yes
-DEP_APPS           := $(shell $(FRAMEWORK_DIR)/scripts/find_dep_apps.py $(APPLICATION_NAME))
-include            $(FRAMEWORK_DIR)/app.mk
 
 # Use the CRANE submodule if it exists and CRANE_DIR is not set
 CRANE_SUBMODULE := $(CURDIR)/crane
@@ -67,4 +61,4 @@ DEP_APPS           := $(shell $(FRAMEWORK_DIR)/scripts/find_dep_apps.py $(APPLIC
 include            $(FRAMEWORK_DIR)/app.mk
 
 ###############################################################################
-# Additional special case targets should be added here
+# Additional special case targets should be added here Additional special case targets should be added here
