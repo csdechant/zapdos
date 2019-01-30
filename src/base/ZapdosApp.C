@@ -63,6 +63,8 @@ ZapdosApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
 {
   // add actions
   Registry::registerActionsTo(action_factory, {"ZapdosApp"});
+  //syntax.registerActionSyntax("AddDriftDiffusionAction", "DriftDiffusionAction");
+  syntax.registerActionSyntax("AddDriftDiffusionActionEM", "DriftDiffusionActionEM");
   syntax.registerActionSyntax("AddLotsOfCoeffDiffusion", "LotsOfCoeffDiffusion");
   syntax.registerActionSyntax("AddLotsOfVariables", "LotsOfVariables");
   syntax.registerActionSyntax("AddLotsOfSources", "LotsOfSources");
