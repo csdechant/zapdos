@@ -272,6 +272,7 @@ GasElectronMoments2::computeQpProperties()
           _diff_interpolation.sampleDerivative(std::exp(_mean_en[_qp] - _em[_qp])) * _time_units / (_n_gas[_qp] * _N_A[_qp]);
       }
       else
+      {
       _muem[_qp] =
           (std::tanh(_t / 1e-6) * _mu_interpolation.sample(std::exp(_mean_en[_qp] - _em[_qp])) +
            (1. - std::tanh(_t / 1e-6)) * .0352) *
@@ -285,6 +286,7 @@ GasElectronMoments2::computeQpProperties()
       _d_diffem_d_actual_mean_en[_qp] =
           std::tanh(_t / 1e-6) *
           _diff_interpolation.sampleDerivative(std::exp(_mean_en[_qp] - _em[_qp])) * _time_units / (_n_gas[_qp]);
+      }
     }
     else
     {
@@ -298,12 +300,14 @@ GasElectronMoments2::computeQpProperties()
           _diff_interpolation.sampleDerivative(std::exp(_mean_en[_qp] - _em[_qp])) * _time_units / (_n_gas[_qp] * _N_A[_qp]);
       }
       else
+      {
       _muem[_qp] = _mu_interpolation.sample(std::exp(_mean_en[_qp] - _em[_qp])) * _voltage_scaling * _time_units / (_n_gas[_qp]);
       _d_muem_d_actual_mean_en[_qp] =
           _mu_interpolation.sampleDerivative(std::exp(_mean_en[_qp] - _em[_qp])) * _voltage_scaling * _time_units / (_n_gas[_qp]);
       _diffem[_qp] = _diff_interpolation.sample(std::exp(_mean_en[_qp] - _em[_qp])) * _time_units / (_n_gas[_qp]);
       _d_diffem_d_actual_mean_en[_qp] =
           _diff_interpolation.sampleDerivative(std::exp(_mean_en[_qp] - _em[_qp])) * _time_units / (_n_gas[_qp]);
+      }
     }
   }
   else
