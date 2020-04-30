@@ -10,6 +10,9 @@
 
 #include "EconomouDielectricBC.h"
 
+// MOOSE includes
+#include "MooseVariable.h"
+
 registerMooseObject("ZapdosApp", EconomouDielectricBC);
 
 template <>
@@ -59,19 +62,19 @@ EconomouDielectricBC::EconomouDielectricBC(const InputParameters & parameters)
     _epsilon_d(getParam<Real>("dielectric_constant")),
     _thickness(getParam<Real>("thickness")),
     _a(0.5),
-    _ion_flux(0),
+    _ion_flux(0, 0, 0),
     _v_thermal(0),
-    _em_flux(0),
-    _d_ion_flux_du(0),
-    _d_em_flux_du(0),
+    _em_flux(0, 0, 0),
+    _d_ion_flux_du(0, 0, 0),
+    _d_em_flux_du(0, 0, 0),
     _d_v_thermal_d_mean_en(0),
-    _d_em_flux_d_mean_en(0),
+    _d_em_flux_d_mean_en(0, 0, 0),
     _d_v_thermal_d_em(0),
-    _d_em_flux_d_em(0),
-    _d_ion_flux_d_ip(0),
-    _d_em_flux_d_ip(0),
-    _d_ion_flux_d_potential_ion(0),
-    _d_em_flux_d_potential_ion(0),
+    _d_em_flux_d_em(0, 0, 0),
+    _d_ion_flux_d_ip(0, 0, 0),
+    _d_em_flux_d_ip(0, 0, 0),
+    _d_ion_flux_d_potential_ion(0, 0, 0),
+    _d_em_flux_d_potential_ion(0, 0, 0),
     _potential_units(getParam<std::string>("potential_units"))
 
 {
@@ -103,7 +106,7 @@ EconomouDielectricBC::computeQpResidual()
       (0.25 * _v_thermal * std::exp(_em[_qp]) * _normals[_qp]) - (_user_se_coeff * _ion_flux);
 
   return _test[_i][_qp] * _r_units *
-         ((_thickness / _epsilon_d) * (_e[_qp] * _ion_flux - _e[_qp] * _em_flux) * _normals[_qp] /
+         ((_thickness / _epsilon_d) * _e[_qp] * 6.022e23 * (_ion_flux - _em_flux) * _normals[_qp] /
               _voltage_scaling +
           (_thickness / _epsilon_d) * 8.8542e-12 * -_grad_u_dot[_qp] * _r_units * _normals[_qp] -
           _u_dot[_qp]);
@@ -121,8 +124,16 @@ EconomouDielectricBC::computeQpJacobian()
     _a = 0.0;
   }
 
+  if (_var.number() == _potential_ion_id)
+  {
+    _d_ion_flux_du =
+      (_a * _sgnip[_qp] * _muip[_qp] * -_grad_phi[_j][_qp] * _r_units * std::exp(_ip[_qp]));
+  }
+
   return _test[_i][_qp] * _r_units *
-         ((_thickness / _epsilon_d) * 8.8542e-12 * _du_dot_du[_qp] * -_grad_phi[_j][_qp] *
+         ((_thickness / _epsilon_d) * _e[_qp] * 6.022e23 * _d_ion_flux_du * _normals[_qp] /
+              _voltage_scaling +
+           (_thickness / _epsilon_d) * 8.8542e-12 * _du_dot_du[_qp] * -_grad_phi[_j][_qp] *
               _r_units * _normals[_qp] -
           _du_dot_du[_qp] * _phi[_j][_qp]);
 }
@@ -141,7 +152,7 @@ EconomouDielectricBC::computeQpOffDiagJacobian(unsigned int jvar)
     _d_em_flux_d_mean_en = (0.25 * _d_v_thermal_d_mean_en * std::exp(_em[_qp]) * _normals[_qp]);
 
     return _test[_i][_qp] * _r_units * (_thickness / _epsilon_d) *
-           (-_e[_qp] * _d_em_flux_d_mean_en) * _normals[_qp] / _voltage_scaling;
+           (-_e[_qp] * 6.022e23 * _d_em_flux_d_mean_en) * _normals[_qp] / _voltage_scaling;
   }
 
   else if (jvar == _em_id)
@@ -155,7 +166,7 @@ EconomouDielectricBC::computeQpOffDiagJacobian(unsigned int jvar)
                         0.25 * _v_thermal * std::exp(_em[_qp]) * _phi[_j][_qp]) *
                        _normals[_qp]);
 
-    return _test[_i][_qp] * _r_units * (_thickness / _epsilon_d) * (-_e[_qp] * _d_em_flux_d_em) *
+    return _test[_i][_qp] * _r_units * (_thickness / _epsilon_d) * (-_e[_qp] * 6.022e23 * _d_em_flux_d_em) *
            _normals[_qp] / _voltage_scaling;
   }
 
@@ -176,7 +187,7 @@ EconomouDielectricBC::computeQpOffDiagJacobian(unsigned int jvar)
     _d_em_flux_d_ip = -_user_se_coeff * _d_ion_flux_d_ip;
 
     return _test[_i][_qp] * _r_units * (_thickness / _epsilon_d) *
-           (_e[_qp] * _d_ion_flux_d_ip - _e[_qp] * _d_em_flux_d_ip) * _normals[_qp] /
+           _e[_qp] * 6.022e23 * (_d_ion_flux_d_ip - _d_em_flux_d_ip) * _normals[_qp] /
            _voltage_scaling;
   }
 
@@ -197,7 +208,7 @@ EconomouDielectricBC::computeQpOffDiagJacobian(unsigned int jvar)
     _d_em_flux_d_potential_ion = -_user_se_coeff * _d_ion_flux_d_potential_ion;
 
     return _test[_i][_qp] * _r_units * (_thickness / _epsilon_d) *
-           (_e[_qp] * _d_ion_flux_d_potential_ion - _e[_qp] * _d_em_flux_d_potential_ion) *
+           _e[_qp] * 6.022e23 * (_d_ion_flux_d_potential_ion - _d_em_flux_d_potential_ion) *
            _normals[_qp] / _voltage_scaling;
   }
 

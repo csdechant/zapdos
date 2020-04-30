@@ -10,6 +10,9 @@
 
 #include "SakiyamaElectronDiffusionBC.h"
 
+// MOOSE includes
+#include "MooseVariable.h"
+
 registerMooseObject("ZapdosApp", SakiyamaElectronDiffusionBC);
 
 template <>
@@ -17,7 +20,6 @@ InputParameters
 validParams<SakiyamaElectronDiffusionBC>()
 {
   InputParameters params = validParams<IntegratedBC>();
-  // params.addRequiredParam<Real>("r", "The reflection coefficient");
   params.addRequiredCoupledVar("mean_en", "The mean energy.");
   params.addRequiredParam<Real>("position_units", "Units of position.");
   params.addClassDescription("Kinetic electron boundary condition"
@@ -39,8 +41,7 @@ SakiyamaElectronDiffusionBC::SakiyamaElectronDiffusionBC(const InputParameters &
     _a(0.5),
     _v_thermal(0),
     _d_v_thermal_d_u(0),
-    _d_v_thermal_d_mean_en(0),
-    _actual_mean_en(0)
+    _d_v_thermal_d_mean_en(0)
 {
 }
 
@@ -58,7 +59,6 @@ Real
 SakiyamaElectronDiffusionBC::computeQpJacobian()
 {
 
-  _actual_mean_en = std::exp(_mean_en[_qp] - _u[_qp]);
   _v_thermal =
       std::sqrt(8 * _e[_qp] * 2.0 / 3 * std::exp(_mean_en[_qp] - _u[_qp]) / (M_PI * _massem[_qp]));
   _d_v_thermal_d_u = 0.5 / _v_thermal * 8 * _e[_qp] * 2.0 / 3 * std::exp(_mean_en[_qp] - _u[_qp]) /
@@ -81,7 +81,6 @@ SakiyamaElectronDiffusionBC::computeQpOffDiagJacobian(unsigned int jvar)
     _d_v_thermal_d_mean_en = 0.5 / _v_thermal * 8 * _e[_qp] * 2.0 / 3 *
                              std::exp(_mean_en[_qp] - _u[_qp]) / (M_PI * _massem[_qp]) *
                              _phi[_j][_qp];
-    _actual_mean_en = std::exp(_mean_en[_qp] - _u[_qp]);
 
     return _test[_i][_qp] * _r_units * (0.25 * _d_v_thermal_d_mean_en * std::exp(_u[_qp]));
   }

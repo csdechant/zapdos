@@ -8,8 +8,7 @@
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
 
-#ifndef EconomouDielectricBC_H
-#define EconomouDielectricBC_H
+#pragma once
 
 #include "IntegratedBC.h"
 
@@ -74,5 +73,3 @@ protected:
 
   Real _voltage_scaling;
 };
-
-#endif // LymberopoulosElectronBC_H
