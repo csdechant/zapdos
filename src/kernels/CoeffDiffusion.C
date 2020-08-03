@@ -21,6 +21,7 @@ validParams<CoeffDiffusion>()
 {
   InputParameters params = validParams<Diffusion>();
   params.addRequiredParam<Real>("position_units", "Units of position.");
+  params.addParam<bool>("log_form", true, "Are the densities using a log form?.");
   params.addClassDescription("Generic diffusion term"
                              "(Densities must be in log form)");
   return params;
@@ -33,7 +34,8 @@ CoeffDiffusion::CoeffDiffusion(const InputParameters & parameters)
 
     _r_units(1. / getParam<Real>("position_units")),
 
-    _diffusivity(getMaterialProperty<Real>("diff" + _var.name()))
+    _diffusivity(getMaterialProperty<Real>("diff" + _var.name())),
+    _log_form(getParam<bool>("log_form"))
 {
 }
 
@@ -42,15 +44,31 @@ CoeffDiffusion::~CoeffDiffusion() {}
 Real
 CoeffDiffusion::computeQpResidual()
 {
-  return -_diffusivity[_qp] * std::exp(_u[_qp]) * _grad_u[_qp] * _r_units * -_grad_test[_i][_qp] *
-         _r_units;
+  if (_log_form)
+  {
+    return -_diffusivity[_qp] * std::exp(_u[_qp]) * _grad_u[_qp] * _r_units * -_grad_test[_i][_qp] *
+           _r_units;
+  }
+  else
+  {
+    return -_diffusivity[_qp] * _grad_u[_qp] * _r_units * -_grad_test[_i][_qp] *
+           _r_units;
+  }
 }
 
 Real
 CoeffDiffusion::computeQpJacobian()
 {
-  return -_diffusivity[_qp] *
-         (std::exp(_u[_qp]) * _grad_phi[_j][_qp] * _r_units +
-          std::exp(_u[_qp]) * _phi[_j][_qp] * _grad_u[_qp] * _r_units) *
-         -_grad_test[_i][_qp] * _r_units;
+  if (_log_form)
+  {
+    return -_diffusivity[_qp] *
+           (std::exp(_u[_qp]) * _grad_phi[_j][_qp] * _r_units +
+            std::exp(_u[_qp]) * _phi[_j][_qp] * _grad_u[_qp] * _r_units) *
+           -_grad_test[_i][_qp] * _r_units;
+  }
+  else
+  {
+    return -_diffusivity[_qp] *
+            _grad_phi[_j][_qp] * _r_units * -_grad_test[_i][_qp] * _r_units;
+  }
 }

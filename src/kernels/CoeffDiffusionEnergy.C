@@ -19,6 +19,7 @@ validParams<CoeffDiffusionEnergy>()
   InputParameters params = validParams<Kernel>();
   params.addRequiredCoupledVar("em", "The log of the electron density.");
   params.addRequiredParam<Real>("position_units", "Units of position.");
+  params.addParam<bool>("log_form", true, "Are the densities using a log form?.");
   params.addClassDescription("Electron energy specific diffusion term"
                              "(Densities must be in log form)");
   return params;
@@ -38,7 +39,8 @@ CoeffDiffusionEnergy::CoeffDiffusionEnergy(const InputParameters & parameters)
     _em_id(coupled("em")),
 
     _d_diffel_d_u(0),
-    _d_diffel_d_em(0)
+    _d_diffel_d_em(0),
+    _log_form(getParam<bool>("log_form"))
 {
 }
 
@@ -47,35 +49,72 @@ CoeffDiffusionEnergy::~CoeffDiffusionEnergy() {}
 Real
 CoeffDiffusionEnergy::computeQpResidual()
 {
-  return -_diffel[_qp] * std::exp(_u[_qp]) * _grad_u[_qp] * _r_units * -_grad_test[_i][_qp] *
-         _r_units;
+  if (_log_form)
+  {
+    return -_diffel[_qp] * std::exp(_u[_qp]) * _grad_u[_qp] * _r_units * -_grad_test[_i][_qp] *
+           _r_units;
+  }
+  else
+  {
+    return -_diffel[_qp] * _grad_u[_qp] * _r_units * -_grad_test[_i][_qp] *
+           _r_units;
+  }
 }
 
 Real
 CoeffDiffusionEnergy::computeQpJacobian()
 {
-  _d_diffel_d_u = _d_diffel_d_actual_mean_en[_qp] * std::exp(_u[_qp] - _em[_qp]) * _phi[_j][_qp];
+  if (_log_form)
+  {
+    _d_diffel_d_u = _d_diffel_d_actual_mean_en[_qp] * std::exp(_u[_qp] - _em[_qp]) * _phi[_j][_qp];
 
-  return -_diffel[_qp] *
-             (std::exp(_u[_qp]) * _grad_phi[_j][_qp] * _r_units +
-              std::exp(_u[_qp]) * _phi[_j][_qp] * _grad_u[_qp] * _r_units) *
-             -_grad_test[_i][_qp] * _r_units -
-         _d_diffel_d_u * std::exp(_u[_qp]) * _grad_u[_qp] * _r_units * -_grad_test[_i][_qp] *
-             _r_units;
+    return -_diffel[_qp] *
+               (std::exp(_u[_qp]) * _grad_phi[_j][_qp] * _r_units +
+                std::exp(_u[_qp]) * _phi[_j][_qp] * _grad_u[_qp] * _r_units) *
+               -_grad_test[_i][_qp] * _r_units -
+           _d_diffel_d_u * std::exp(_u[_qp]) * _grad_u[_qp] * _r_units * -_grad_test[_i][_qp] *
+               _r_units;
+  }
+  else
+  {
+    _d_diffel_d_u = _d_diffel_d_actual_mean_en[_qp] * 1.0 / _em[_qp] * _phi[_j][_qp];
+
+    return -_diffel[_qp] *
+               _grad_phi[_j][_qp] * _r_units * -_grad_test[_i][_qp] * _r_units -
+           _d_diffel_d_u * _grad_u[_qp] * _r_units * -_grad_test[_i][_qp] *
+               _r_units;
+  }
 }
 
 Real
 CoeffDiffusionEnergy::computeQpOffDiagJacobian(unsigned int jvar)
 {
-  if (jvar == _em_id)
+  if (_log_form)
   {
-    _d_diffel_d_em =
-        _d_diffel_d_actual_mean_en[_qp] * std::exp(_u[_qp] - _em[_qp]) * -_phi[_j][_qp];
+    if (jvar == _em_id)
+    {
+      _d_diffel_d_em =
+          _d_diffel_d_actual_mean_en[_qp] * std::exp(_u[_qp] - _em[_qp]) * -_phi[_j][_qp];
 
-    return -_d_diffel_d_em * std::exp(_u[_qp]) * _grad_u[_qp] * _r_units * -_grad_test[_i][_qp] *
-           _r_units;
+      return -_d_diffel_d_em * std::exp(_u[_qp]) * _grad_u[_qp] * _r_units * -_grad_test[_i][_qp] *
+             _r_units;
+    }
+
+    else
+      return 0.;
   }
-
   else
-    return 0.;
+  {
+    if (jvar == _em_id)
+    {
+      _d_diffel_d_em =
+          _d_diffel_d_actual_mean_en[_qp] * _u[_qp] / (_em[_qp] * _em[_qp]) * -_phi[_j][_qp];
+
+      return -_d_diffel_d_em * _grad_u[_qp] * _r_units * -_grad_test[_i][_qp] *
+             _r_units;
+    }
+
+    else
+      return 0.;
+  }
 }

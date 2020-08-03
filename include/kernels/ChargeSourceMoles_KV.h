@@ -41,6 +41,7 @@ protected:
   const MaterialProperty<Real> & _sgn;
   const MaterialProperty<Real> & _N_A;
   std::string _potential_units;
+  bool _log_form;
 
   Real _voltage_scaling;
 };

@@ -23,6 +23,7 @@ validParams<EFieldAdvection>()
   params.addRequiredCoupledVar(
       "potential", "The gradient of the potential will be used to compute the advection velocity.");
   params.addRequiredParam<Real>("position_units", "Units of position.");
+  params.addParam<bool>("log_form", true, "Are the densities using a log form?.");
   params.addClassDescription("Generic electric field driven advection term"
                              "(Densities must be in log form)");
   return params;
@@ -35,6 +36,7 @@ EFieldAdvection::EFieldAdvection(const InputParameters & parameters)
 
     _mu(getMaterialProperty<Real>("mu" + _var.name())),
     _sign(getMaterialProperty<Real>("sgn" + _var.name())),
+    _log_form(getParam<bool>("log_form")),
 
     // Coupled variables
 
@@ -46,23 +48,50 @@ EFieldAdvection::EFieldAdvection(const InputParameters & parameters)
 Real
 EFieldAdvection::computeQpResidual()
 {
-  return _mu[_qp] * _sign[_qp] * std::exp(_u[_qp]) * -_grad_potential[_qp] * _r_units *
-         -_grad_test[_i][_qp] * _r_units;
+  if (_log_form)
+  {
+    return _mu[_qp] * _sign[_qp] * std::exp(_u[_qp]) * -_grad_potential[_qp] * _r_units *
+           -_grad_test[_i][_qp] * _r_units;
+  }
+  else
+  {
+    return _mu[_qp] * _sign[_qp] * _u[_qp] * -_grad_potential[_qp] * _r_units *
+           -_grad_test[_i][_qp] * _r_units;
+  }
 }
 
 Real
 EFieldAdvection::computeQpJacobian()
 {
-  return _mu[_qp] * _sign[_qp] * std::exp(_u[_qp]) * _phi[_j][_qp] * -_grad_potential[_qp] *
-         _r_units * -_grad_test[_i][_qp] * _r_units;
+  if (_log_form)
+  {
+    return _mu[_qp] * _sign[_qp] * std::exp(_u[_qp]) * _phi[_j][_qp] * -_grad_potential[_qp] *
+           _r_units * -_grad_test[_i][_qp] * _r_units;
+  }
+  else
+  {
+    return _mu[_qp] * _sign[_qp] * _phi[_j][_qp] * -_grad_potential[_qp] *
+           _r_units * -_grad_test[_i][_qp] * _r_units;
+  }
 }
 
 Real
 EFieldAdvection::computeQpOffDiagJacobian(unsigned int jvar)
 {
-  if (jvar == _potential_id)
-    return _mu[_qp] * _sign[_qp] * std::exp(_u[_qp]) * -_grad_phi[_j][_qp] * _r_units *
-           -_grad_test[_i][_qp] * _r_units;
+  if (_log_form)
+  {
+    if (jvar == _potential_id)
+      return _mu[_qp] * _sign[_qp] * std::exp(_u[_qp]) * -_grad_phi[_j][_qp] * _r_units *
+             -_grad_test[_i][_qp] * _r_units;
+    else
+      return 0.;
+  }
   else
-    return 0.;
+  {
+    if (jvar == _potential_id)
+      return _mu[_qp] * _sign[_qp] * _u[_qp] * -_grad_phi[_j][_qp] * _r_units *
+             -_grad_test[_i][_qp] * _r_units;
+    else
+      return 0.;
+  }
 }

@@ -41,6 +41,7 @@ protected:
 
   Real _d_diffem_d_u;
   Real _d_diffem_d_mean_en;
+  bool _log_form;
 };
 
 #endif /* COEFFDIFFUSIONELECTRONS_H */

@@ -19,6 +19,7 @@ validParams<ThermalConductivityDiffusion>()
   InputParameters params = validParams<Kernel>();
   params.addRequiredCoupledVar("em", "The log of the electron density.");
   params.addRequiredParam<Real>("position_units", "Units of position.");
+  params.addParam<bool>("log_form", true, "Are the densities using a log form?.");
   params.addClassDescription("Electron energy diffusion term "
                              "that assumes a thermal conductivity of "
                              "$K = 3/2 D_e n_e$ ");
@@ -35,8 +36,9 @@ ThermalConductivityDiffusion::ThermalConductivityDiffusion(const InputParameters
 
     _r_units(1. / getParam<Real>("position_units")),
     _coeff(2.0 / 3.0),
+    _log_form(getParam<bool>("log_form")),
 
-    _diffem(getMaterialProperty<Real>("diffmean_en")),
+    _diffem(getMaterialProperty<Real>("diffem")),
     _d_diffem_d_actual_mean_en(getMaterialProperty<Real>("d_diffem_d_actual_mean_en")),
 
     _em(coupledValue("em")),
@@ -53,47 +55,98 @@ ThermalConductivityDiffusion::~ThermalConductivityDiffusion() {}
 Real
 ThermalConductivityDiffusion::computeQpResidual()
 {
-  Real actual_mean_en = std::exp(_u[_qp] - _em[_qp]);
+  if (_log_form)
+  {
+    Real actual_mean_en = std::exp(_u[_qp] - _em[_qp]);
 
-  return -_grad_test[_i][_qp] * _r_units * _coeff * _diffem[_qp] *
-          (std::exp(_u[_qp]) * _grad_u[_qp] * _r_units -
-           actual_mean_en * std::exp(_em[_qp]) * _grad_em[_qp] * _r_units);
+    return -_grad_test[_i][_qp] * _r_units * _coeff * _diffem[_qp] *
+            (std::exp(_u[_qp]) * _grad_u[_qp] * _r_units -
+             actual_mean_en * std::exp(_em[_qp]) * _grad_em[_qp] * _r_units);
+  }
+  else
+  {
+    Real actual_mean_en = _u[_qp] / _em[_qp];
+
+    return -_grad_test[_i][_qp] * _r_units * _coeff * _diffem[_qp] *
+            (_grad_u[_qp] * _r_units -
+             actual_mean_en * _grad_em[_qp] * _r_units);
+  }
 }
 
 Real
 ThermalConductivityDiffusion::computeQpJacobian()
 {
-  Real actual_mean_en = std::exp(_u[_qp] - _em[_qp]);
+  if (_log_form)
+  {
+    Real actual_mean_en = std::exp(_u[_qp] - _em[_qp]);
 
-  _d_diffem_d_u =
-      _d_diffem_d_actual_mean_en[_qp] * actual_mean_en * _phi[_j][_qp];
+    _d_diffem_d_u =
+        _d_diffem_d_actual_mean_en[_qp] * actual_mean_en * _phi[_j][_qp];
 
-  return -_grad_test[_i][_qp] * _r_units * _coeff * _r_units *
-         (_d_diffem_d_u * std::exp(_u[_qp]) * _grad_u[_qp] +
-          _diffem[_qp] * std::exp(_u[_qp]) * _phi[_j][_qp] * _grad_u[_qp] +
-          _diffem[_qp] * std::exp(_u[_qp]) * _grad_phi[_j][_qp] -
-          _d_diffem_d_u * actual_mean_en * std::exp(_em[_qp]) * _grad_em[_qp] -
-          _diffem[_qp] * actual_mean_en * _phi[_j][_qp] * std::exp(_em[_qp]) * _grad_em[_qp]);
+    return -_grad_test[_i][_qp] * _r_units * _coeff * _r_units *
+           (_d_diffem_d_u * std::exp(_u[_qp]) * _grad_u[_qp] +
+            _diffem[_qp] * std::exp(_u[_qp]) * _phi[_j][_qp] * _grad_u[_qp] +
+            _diffem[_qp] * std::exp(_u[_qp]) * _grad_phi[_j][_qp] -
+            _d_diffem_d_u * actual_mean_en * std::exp(_em[_qp]) * _grad_em[_qp] -
+            _diffem[_qp] * actual_mean_en * _phi[_j][_qp] * std::exp(_em[_qp]) * _grad_em[_qp]);
+  }
+  else
+  {
+    Real actual_mean_en = _u[_qp] / _em[_qp];
+    Real d_actual_mean_en_d_u = (1.0 / _em[_qp]) * _phi[_j][_qp];
+
+    _d_diffem_d_u =
+        _d_diffem_d_actual_mean_en[_qp] * d_actual_mean_en_d_u;
+
+    return -_grad_test[_i][_qp] * _r_units * _coeff * _r_units *
+           (_d_diffem_d_u * _grad_u[_qp] +
+            _diffem[_qp] * _grad_phi[_j][_qp] -
+            _d_diffem_d_u * actual_mean_en * _grad_em[_qp] -
+            _diffem[_qp] * d_actual_mean_en_d_u * _grad_em[_qp]);
+  }
 }
 
 Real
 ThermalConductivityDiffusion::computeQpOffDiagJacobian(unsigned int jvar)
 {
-  if (jvar == _em_id)
+  if (_log_form)
   {
-    Real actual_mean_en = std::exp(_u[_qp] - _em[_qp]);
+    if (jvar == _em_id)
+    {
+      Real actual_mean_en = std::exp(_u[_qp] - _em[_qp]);
 
-    _d_diffem_d_em =
-        _d_diffem_d_actual_mean_en[_qp] * actual_mean_en * -_phi[_j][_qp];
+      _d_diffem_d_em =
+          _d_diffem_d_actual_mean_en[_qp] * actual_mean_en * -_phi[_j][_qp];
 
-    return -_grad_test[_i][_qp] * _r_units * _coeff * _r_units *
-           (_d_diffem_d_em * std::exp(_u[_qp]) * _grad_u[_qp] -
-            _d_diffem_d_em * actual_mean_en * std::exp(_em[_qp]) * _grad_em[_qp] -
-            _diffem[_qp] * actual_mean_en * -_phi[_j][_qp] * std::exp(_em[_qp]) * _grad_em[_qp] -
-            _diffem[_qp] * actual_mean_en * std::exp(_em[_qp]) * _phi[_j][_qp] * _grad_em[_qp] -
-            _diffem[_qp] * actual_mean_en * std::exp(_em[_qp]) * _grad_phi[_j][_qp]);
+      return -_grad_test[_i][_qp] * _r_units * _coeff * _r_units *
+             (_d_diffem_d_em * std::exp(_u[_qp]) * _grad_u[_qp] -
+              _d_diffem_d_em * actual_mean_en * std::exp(_em[_qp]) * _grad_em[_qp] -
+              _diffem[_qp] * actual_mean_en * -_phi[_j][_qp] * std::exp(_em[_qp]) * _grad_em[_qp] -
+              _diffem[_qp] * actual_mean_en * std::exp(_em[_qp]) * _phi[_j][_qp] * _grad_em[_qp] -
+              _diffem[_qp] * actual_mean_en * std::exp(_em[_qp]) * _grad_phi[_j][_qp]);
+    }
+
+    else
+      return 0.;
   }
-
   else
-    return 0.;
+  {
+    if (jvar == _em_id)
+    {
+      Real actual_mean_en = _u[_qp] / _em[_qp];
+      Real d_actual_mean_en_d_em = _u[_qp] / (_em[_qp] * _em[_qp]) * -_phi[_j][_qp];
+
+      _d_diffem_d_em =
+          _d_diffem_d_actual_mean_en[_qp] * d_actual_mean_en_d_em;
+
+      return -_grad_test[_i][_qp] * _r_units * _coeff * _r_units *
+             (_d_diffem_d_em * _grad_u[_qp] -
+              _d_diffem_d_em * actual_mean_en * _grad_em[_qp] -
+              _diffem[_qp] * d_actual_mean_en_d_em * _grad_em[_qp] -
+              _diffem[_qp] * actual_mean_en * _grad_phi[_j][_qp]);
+    }
+
+    else
+      return 0.;
+  }
 }

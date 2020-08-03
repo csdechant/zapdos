@@ -28,6 +28,8 @@ protected:
   virtual Real computeQpOffDiagJacobian(unsigned int jvar);
 
   Real _r_units;
+  bool _log_form;
+
   Real _ks;
   Real _gamma;
 
@@ -51,4 +53,3 @@ protected:
   RealVectorValue _d_ion_flux_d_V;
   RealVectorValue _d_ion_flux_d_ion;
 };
-

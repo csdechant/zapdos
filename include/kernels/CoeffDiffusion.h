@@ -33,6 +33,7 @@ protected:
   Real _r_units;
 
   const MaterialProperty<Real> & _diffusivity;
+  bool _log_form;
 };
 
 #endif /* COEFFDIFFUSION_H */

@@ -18,12 +18,15 @@ validParams<ElectronTimeDerivative>()
 {
   InputParameters params = validParams<TimeKernel>();
   params.addParam<bool>("lumping", false, "True for mass matrix lumping, false otherwise");
+  params.addParam<bool>("log_form", true, "Are the densities using a log form?.");
   params.addClassDescription("Generic accumulation term for variables in log form.");
   return params;
 }
 
 ElectronTimeDerivative::ElectronTimeDerivative(const InputParameters & parameters)
-  : TimeKernel(parameters), _lumping(getParam<bool>("lumping"))
+  : TimeKernel(parameters),
+    _lumping(getParam<bool>("lumping")),
+    _log_form(getParam<bool>("log_form"))
 
 {
 }
@@ -31,12 +34,26 @@ ElectronTimeDerivative::ElectronTimeDerivative(const InputParameters & parameter
 Real
 ElectronTimeDerivative::computeQpResidual()
 {
-  return _test[_i][_qp] * std::exp(_u[_qp]) * _u_dot[_qp];
+  if (_log_form)
+  {
+    return _test[_i][_qp] * std::exp(_u[_qp]) * _u_dot[_qp];
+  }
+  else
+  {
+    return _test[_i][_qp] * _u_dot[_qp];
+  }
 }
 
 Real
 ElectronTimeDerivative::computeQpJacobian()
 {
-  return _test[_i][_qp] * (std::exp(_u[_qp]) * _phi[_j][_qp] * _u_dot[_qp] +
-                           std::exp(_u[_qp]) * _du_dot_du[_qp] * _phi[_j][_qp]);
+  if (_log_form)
+  {
+    return _test[_i][_qp] * (std::exp(_u[_qp]) * _phi[_j][_qp] * _u_dot[_qp] +
+                             std::exp(_u[_qp]) * _du_dot_du[_qp] * _phi[_j][_qp]);
+  }
+  else
+  {
+    return _test[_i][_qp] * _du_dot_du[_qp] * _phi[_j][_qp];
+  }
 }

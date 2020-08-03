@@ -41,6 +41,7 @@ protected:
 
   Real _d_diffel_d_u;
   Real _d_diffel_d_em;
+  bool _log_form;
 };
 
 #endif /* COEFFDIFFUSIONENERGY_H */

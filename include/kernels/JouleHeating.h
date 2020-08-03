@@ -50,6 +50,8 @@ protected:
   const VariableGradient & _grad_em;
   unsigned int _em_id;
 
+  bool _log_form;
+
   // Unique variables
 
   Real _voltage_scaling;

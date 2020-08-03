@@ -35,6 +35,8 @@ protected:
   const MaterialProperty<Real> & _mu;
   const MaterialProperty<Real> & _sign;
 
+  bool _log_form;
+
 private:
   // Coupled variables
   unsigned int _potential_id;

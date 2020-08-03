@@ -62,6 +62,7 @@ validParams<GasElectronMoments>()
                         false,
                         "Are the values for the electron mobility and diffusion coefficient "
                         "dependent on gas pressure");
+  params.addParam<bool>("log_form", true, "Are the densities using a log form?.");
   params.addClassDescription("Material properties of electrons"
                              "(Defines reaction properties with rate coefficients)");
 
@@ -88,6 +89,7 @@ GasElectronMoments::GasElectronMoments(const InputParameters & parameters)
     //_user_T_gas(isCoupled("user_T_gas") ? coupledValue("user_T_gas") : _zero),
     _user_p_gas(coupledValue("user_p_gas")),
     _use_moles(getParam<bool>("use_moles")),
+    _log_form(getParam<bool>("log_form")),
 
     _user_muem(getParam<Real>("user_electron_mobility")),
     _user_diffem(getParam<Real>("user_electron_diffusion_coeff")),
@@ -263,6 +265,15 @@ GasElectronMoments::computeQpProperties()
   //_sgnArp[_qp] = 1.;
   _diffpotential[_qp] = _eps[_qp];
 
+  if (_log_form)
+  {
+    _actual_mean_energy[_qp] = std::exp(_mean_en[_qp] - _em[_qp]);
+  }
+  else
+  {
+    _actual_mean_energy[_qp] = _mean_en[_qp] / _em[_qp];
+  }
+
   //_TArp[_qp] = 300;
 
   // With the exception of temperature/energy (generally in eV), all properties are in standard SI
@@ -279,32 +290,32 @@ GasElectronMoments::computeQpProperties()
       if (_ramp_trans_coeffs)
       {
         _muem[_qp] =
-            (std::tanh(_t / 1e-6) * _mu_interpolation.sample(std::exp(_mean_en[_qp] - _em[_qp])) +
+            (std::tanh(_t / 1e-6) * _mu_interpolation.sample(_actual_mean_energy[_qp]) +
              (1. - std::tanh(_t / 1e-6)) * .0352) *
             _voltage_scaling * _time_units * _N_inverse;
         _d_muem_d_actual_mean_en[_qp] =
             std::tanh(_t / 1e-6) *
-            _mu_interpolation.sampleDerivative(std::exp(_mean_en[_qp] - _em[_qp])) *
+            _mu_interpolation.sampleDerivative(_actual_mean_energy[_qp]) *
             _voltage_scaling * _time_units * _N_inverse;
         _diffem[_qp] =
-            std::tanh(_t / 1e-6) * _diff_interpolation.sample(std::exp(_mean_en[_qp] - _em[_qp])) +
+            std::tanh(_t / 1e-6) * _diff_interpolation.sample(_actual_mean_energy[_qp]) +
             (1. - std::tanh(_t / 1e-6)) * .30 * _time_units * _N_inverse;
         _d_diffem_d_actual_mean_en[_qp] =
             std::tanh(_t / 1e-6) *
-            _diff_interpolation.sampleDerivative(std::exp(_mean_en[_qp] - _em[_qp])) * _time_units *
+            _diff_interpolation.sampleDerivative(_actual_mean_energy[_qp]) * _time_units *
             _N_inverse;
       }
       else
       {
-        _muem[_qp] = _mu_interpolation.sample(std::exp(_mean_en[_qp] - _em[_qp])) *
+        _muem[_qp] = _mu_interpolation.sample(_actual_mean_energy[_qp]) *
                      _voltage_scaling * _time_units * _N_inverse;
         _d_muem_d_actual_mean_en[_qp] =
-            _mu_interpolation.sampleDerivative(std::exp(_mean_en[_qp] - _em[_qp])) *
+            _mu_interpolation.sampleDerivative(_actual_mean_energy[_qp]) *
             _voltage_scaling * _time_units * _N_inverse;
-        _diffem[_qp] = _diff_interpolation.sample(std::exp(_mean_en[_qp] - _em[_qp])) *
+        _diffem[_qp] = _diff_interpolation.sample(_actual_mean_energy[_qp]) *
                        _time_units * _N_inverse;
         _d_diffem_d_actual_mean_en[_qp] =
-            _diff_interpolation.sampleDerivative(std::exp(_mean_en[_qp] - _em[_qp])) * _time_units *
+            _diff_interpolation.sampleDerivative(_actual_mean_energy[_qp]) * _time_units *
             _N_inverse;
       }
     }
@@ -332,30 +343,30 @@ GasElectronMoments::computeQpProperties()
       if (_ramp_trans_coeffs)
       {
         _muem[_qp] =
-            (std::tanh(_t / 1e-6) * _mu_interpolation.sample(std::exp(_mean_en[_qp] - _em[_qp])) +
+            (std::tanh(_t / 1e-6) * _mu_interpolation.sample(_actual_mean_energy[_qp]) +
              (1. - std::tanh(_t / 1e-6)) * .0352) *
             _voltage_scaling * _time_units;
         _d_muem_d_actual_mean_en[_qp] =
             std::tanh(_t / 1e-6) *
-            _mu_interpolation.sampleDerivative(std::exp(_mean_en[_qp] - _em[_qp])) *
+            _mu_interpolation.sampleDerivative(_actual_mean_energy[_qp]) *
             _voltage_scaling * _time_units;
         _diffem[_qp] =
-            std::tanh(_t / 1e-6) * _diff_interpolation.sample(std::exp(_mean_en[_qp] - _em[_qp])) +
+            std::tanh(_t / 1e-6) * _diff_interpolation.sample(_actual_mean_energy[_qp]) +
             (1. - std::tanh(_t / 1e-6)) * .30 * _time_units;
         _d_diffem_d_actual_mean_en[_qp] =
             std::tanh(_t / 1e-6) *
-            _diff_interpolation.sampleDerivative(std::exp(_mean_en[_qp] - _em[_qp])) * _time_units;
+            _diff_interpolation.sampleDerivative(_actual_mean_energy[_qp]) * _time_units;
       }
       else
       {
-        _muem[_qp] = _mu_interpolation.sample(std::exp(_mean_en[_qp] - _em[_qp])) *
+        _muem[_qp] = _mu_interpolation.sample(_actual_mean_energy[_qp]) *
                      _voltage_scaling * _time_units;
         _d_muem_d_actual_mean_en[_qp] =
-            _mu_interpolation.sampleDerivative(std::exp(_mean_en[_qp] - _em[_qp])) *
+            _mu_interpolation.sampleDerivative(_actual_mean_energy[_qp]) *
             _voltage_scaling * _time_units;
-        _diffem[_qp] = _diff_interpolation.sample(std::exp(_mean_en[_qp] - _em[_qp])) * _time_units;
+        _diffem[_qp] = _diff_interpolation.sample(_actual_mean_energy[_qp]) * _time_units;
         _d_diffem_d_actual_mean_en[_qp] =
-            _diff_interpolation.sampleDerivative(std::exp(_mean_en[_qp] - _em[_qp])) * _time_units;
+            _diff_interpolation.sampleDerivative(_actual_mean_energy[_qp]) * _time_units;
       }
     }
     else
@@ -461,7 +472,7 @@ GasElectronMoments::computeQpProperties()
   // Might needed to change
   _rate_coeff_elastic[_qp] = 1e-13;
 
-  _TemVolts[_qp] = 2. / 3. * std::exp(_mean_en[_qp] - _em[_qp]);
+  _TemVolts[_qp] = 2. / 3. * _actual_mean_energy[_qp];
   _Tem[_qp] = _e[_qp] * _TemVolts[_qp] / _k_boltz[_qp];
 
   _kiz[_qp] = 2.34e-14 * std::pow(_TemVolts[_qp], .59) * std::exp(-17.44 / _TemVolts[_qp]);

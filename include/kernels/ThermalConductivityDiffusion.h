@@ -31,6 +31,7 @@ protected:
 
   Real _r_units;
   Real _coeff;
+  bool _log_form;
 
   const MaterialProperty<Real> & _diffem;
   const MaterialProperty<Real> & _d_diffem_d_actual_mean_en;

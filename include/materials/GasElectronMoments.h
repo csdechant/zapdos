@@ -55,6 +55,7 @@ protected:
   // const VariableValue & _user_T_gas;
   const VariableValue & _user_p_gas;
   bool _use_moles;
+  bool _log_form;
 
   Real _user_muem;
   Real _user_diffem;

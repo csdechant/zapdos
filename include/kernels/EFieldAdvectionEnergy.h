@@ -36,6 +36,8 @@ protected:
   const MaterialProperty<Real> & _d_muel_d_actual_mean_en;
   const MaterialProperty<Real> & _sign;
 
+  bool _log_form;
+
 private:
   // Coupled variables
   unsigned int _potential_id;

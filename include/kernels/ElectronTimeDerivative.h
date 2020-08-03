@@ -32,6 +32,7 @@ protected:
   /* virtual Real computeQpOffDiagJacobian(unsigned int jvar); */
 
   bool _lumping;
+  bool _log_form;
 };
 
 #endif // ELECTRONTIMEDERIVATIVE_H

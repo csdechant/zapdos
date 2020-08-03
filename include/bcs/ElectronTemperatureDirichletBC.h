@@ -36,6 +36,7 @@ protected:
   unsigned int _em_id;
   Real _value;
   Real _penalty_value;
+  bool _log_form;
 };
 
 #endif // ElectronTemperatureDirichletBC_H

@@ -23,6 +23,7 @@ validParams<JouleHeating>()
   params.addRequiredCoupledVar("em", "The electron density.");
   params.addRequiredParam<std::string>("potential_units", "The potential units.");
   params.addRequiredParam<Real>("position_units", "Units of position.");
+  params.addParam<bool>("log_form", true, "Are the densities using a log form?.");
   params.addClassDescription("Joule heating term for electrons"
                              "(Densities must be in log form)");
   return params;
@@ -47,7 +48,8 @@ JouleHeating::JouleHeating(const InputParameters & parameters)
     _grad_potential(coupledGradient("potential")),
     _em(coupledValue("em")),
     _grad_em(coupledGradient("em")),
-    _em_id(coupled("em"))
+    _em_id(coupled("em")),
+    _log_form(getParam<bool>("log_form"))
 
 // Unique variables
 {
@@ -60,49 +62,99 @@ JouleHeating::JouleHeating(const InputParameters & parameters)
 Real
 JouleHeating::computeQpResidual()
 {
-  return _test[_i][_qp] * -_grad_potential[_qp] * _r_units * _voltage_scaling *
-         (-_muem[_qp] * -_grad_potential[_qp] * _r_units * std::exp(_em[_qp]) -
-          _diffem[_qp] * std::exp(_em[_qp]) * _grad_em[_qp] * _r_units);
+  if (_log_form)
+  {
+    return _test[_i][_qp] * -_grad_potential[_qp] * _r_units * _voltage_scaling *
+           (-_muem[_qp] * -_grad_potential[_qp] * _r_units * std::exp(_em[_qp]) -
+            _diffem[_qp] * std::exp(_em[_qp]) * _grad_em[_qp] * _r_units);
+  }
+  else
+  {
+    return _test[_i][_qp] * -_grad_potential[_qp] * _r_units * _voltage_scaling *
+           (-_muem[_qp] * -_grad_potential[_qp] * _r_units * _em[_qp] -
+            _diffem[_qp] * _grad_em[_qp] * _r_units);
+  }
 }
 
 Real
 JouleHeating::computeQpJacobian()
 {
-  Real actual_mean_en = std::exp(_u[_qp] - _em[_qp]);
-  Real d_muem_d_mean_en = _d_muem_d_actual_mean_en[_qp] * actual_mean_en * _phi[_j][_qp];
-  Real d_diffem_d_mean_en = _d_diffem_d_actual_mean_en[_qp] * actual_mean_en * _phi[_j][_qp];
+  if (_log_form)
+  {
+    Real actual_mean_en = std::exp(_u[_qp] - _em[_qp]);
+    Real d_muem_d_mean_en = _d_muem_d_actual_mean_en[_qp] * actual_mean_en * _phi[_j][_qp];
+    Real d_diffem_d_mean_en = _d_diffem_d_actual_mean_en[_qp] * actual_mean_en * _phi[_j][_qp];
 
-  return _test[_i][_qp] * -_grad_potential[_qp] * _r_units * _voltage_scaling *
-         (-d_muem_d_mean_en * -_grad_potential[_qp] * _r_units * std::exp(_em[_qp]) -
-          d_diffem_d_mean_en * std::exp(_em[_qp]) * _grad_em[_qp] * _r_units);
+    return _test[_i][_qp] * -_grad_potential[_qp] * _r_units * _voltage_scaling *
+           (-d_muem_d_mean_en * -_grad_potential[_qp] * _r_units * std::exp(_em[_qp]) -
+            d_diffem_d_mean_en * std::exp(_em[_qp]) * _grad_em[_qp] * _r_units);
+  }
+  else
+  {
+    Real d_muem_d_mean_en = _d_muem_d_actual_mean_en[_qp] * (1.0 / _em[_qp]) * _phi[_j][_qp];
+    Real d_diffem_d_mean_en = _d_diffem_d_actual_mean_en[_qp] * (1.0 / _em[_qp]) * _phi[_j][_qp];
+
+    return _test[_i][_qp] * -_grad_potential[_qp] * _r_units * _voltage_scaling *
+           (-d_muem_d_mean_en * -_grad_potential[_qp] * _r_units * _em[_qp] -
+            d_diffem_d_mean_en * _grad_em[_qp] * _r_units);
+  }
 }
 
 Real
 JouleHeating::computeQpOffDiagJacobian(unsigned int jvar)
 {
-  if (jvar == _potential_id)
+  if (_log_form)
   {
-    return _test[_i][_qp] * -_grad_potential[_qp] * _r_units * _voltage_scaling *
-               (-_muem[_qp] * -_grad_phi[_j][_qp] * _r_units * std::exp(_em[_qp])) +
-           _test[_i][_qp] * -_grad_phi[_j][_qp] * _r_units * _voltage_scaling *
-               (-_muem[_qp] * -_grad_potential[_qp] * _r_units * std::exp(_em[_qp]) -
-                _diffem[_qp] * std::exp(_em[_qp]) * _grad_em[_qp] * _r_units);
-  }
-  else if (jvar == _em_id)
-  {
-    Real actual_mean_en = std::exp(_u[_qp] - _em[_qp]);
-    Real d_muem_d_em = _d_muem_d_actual_mean_en[_qp] * actual_mean_en * -_phi[_j][_qp];
-    Real d_diffem_d_em = _d_diffem_d_actual_mean_en[_qp] * actual_mean_en * -_phi[_j][_qp];
+    if (jvar == _potential_id)
+    {
+      return _test[_i][_qp] * -_grad_potential[_qp] * _r_units * _voltage_scaling *
+                 (-_muem[_qp] * -_grad_phi[_j][_qp] * _r_units * std::exp(_em[_qp])) +
+             _test[_i][_qp] * -_grad_phi[_j][_qp] * _r_units * _voltage_scaling *
+                 (-_muem[_qp] * -_grad_potential[_qp] * _r_units * std::exp(_em[_qp]) -
+                  _diffem[_qp] * std::exp(_em[_qp]) * _grad_em[_qp] * _r_units);
+    }
+    else if (jvar == _em_id)
+    {
+      Real actual_mean_en = std::exp(_u[_qp] - _em[_qp]);
+      Real d_muem_d_em = _d_muem_d_actual_mean_en[_qp] * actual_mean_en * -_phi[_j][_qp];
+      Real d_diffem_d_em = _d_diffem_d_actual_mean_en[_qp] * actual_mean_en * -_phi[_j][_qp];
 
-    return _test[_i][_qp] * -_grad_potential[_qp] * _r_units * _voltage_scaling *
-           (-_muem[_qp] * -_grad_potential[_qp] * _r_units * std::exp(_em[_qp]) * _phi[_j][_qp] -
-            d_muem_d_em * -_grad_potential[_qp] * _r_units * std::exp(_em[_qp]) -
-            _diffem[_qp] * (std::exp(_em[_qp]) * _phi[_j][_qp] * _grad_em[_qp] * _r_units +
-                            std::exp(_em[_qp]) * _grad_phi[_j][_qp] * _r_units) -
-            d_diffem_d_em * std::exp(_em[_qp]) * _grad_em[_qp] * _r_units);
+      return _test[_i][_qp] * -_grad_potential[_qp] * _r_units * _voltage_scaling *
+             (-_muem[_qp] * -_grad_potential[_qp] * _r_units * std::exp(_em[_qp]) * _phi[_j][_qp] -
+              d_muem_d_em * -_grad_potential[_qp] * _r_units * std::exp(_em[_qp]) -
+              _diffem[_qp] * (std::exp(_em[_qp]) * _phi[_j][_qp] * _grad_em[_qp] * _r_units +
+                              std::exp(_em[_qp]) * _grad_phi[_j][_qp] * _r_units) -
+              d_diffem_d_em * std::exp(_em[_qp]) * _grad_em[_qp] * _r_units);
+    }
+    else
+    {
+      return 0.0;
+    }
   }
   else
   {
-    return 0.0;
+    if (jvar == _potential_id)
+    {
+      return _test[_i][_qp] * -_grad_potential[_qp] * _r_units * _voltage_scaling *
+                 (-_muem[_qp] * -_grad_phi[_j][_qp] * _r_units * _em[_qp]) +
+             _test[_i][_qp] * -_grad_phi[_j][_qp] * _r_units * _voltage_scaling *
+                 (-_muem[_qp] * -_grad_potential[_qp] * _r_units * _em[_qp] -
+                  _diffem[_qp] * _grad_em[_qp] * _r_units);
+    }
+    else if (jvar == _em_id)
+    {
+      Real d_muem_d_em = _d_muem_d_actual_mean_en[_qp] * _u[_qp] / (_em[_qp] * _em[_qp]) * -_phi[_j][_qp];
+      Real d_diffem_d_em = _d_diffem_d_actual_mean_en[_qp] * _u[_qp] / (_em[_qp] * _em[_qp]) * -_phi[_j][_qp];
+
+      return _test[_i][_qp] * -_grad_potential[_qp] * _r_units * _voltage_scaling *
+             (-_muem[_qp] * -_grad_potential[_qp] * _r_units * _phi[_j][_qp] -
+              d_muem_d_em * -_grad_potential[_qp] * _r_units * _em[_qp] -
+              _diffem[_qp] * _grad_phi[_j][_qp] * _r_units -
+              d_diffem_d_em * _grad_em[_qp] * _r_units);
+    }
+    else
+    {
+      return 0.0;
+    }
   }
 }

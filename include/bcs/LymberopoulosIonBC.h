@@ -35,4 +35,5 @@ protected:
   unsigned int _potential_id;
 
   const MaterialProperty<Real> & _mu;
+  bool _log_form;
 };
