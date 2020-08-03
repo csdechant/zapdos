@@ -1,0 +1,44 @@
+[Tests]
+  [./Coupling_Electons_Potential_Ions_MeanEnergy_DependCoeff_Einstein_Relation]
+    type = 'Exodiff'
+    input = 'Coupling_Electons_Potential_Ions_MeanEnergy_DependCoeff_Einstein_Relation_NonLog.i'
+    exodiff = 'Coupling_Electons_Potential_Ions_MeanEnergy_DependCoeff_Einstein_Relation_NonLog_out.e'
+    group = 'MMS_kernels_NonLog'
+  [../]
+  [./Coupling_Electons_Potential_Ions_MeanEnergy_DependCoeff]
+    type = 'Exodiff'
+    input = 'Coupling_Electons_Potential_Ions_MeanEnergy_DependCoeff_NonLog.i'
+    exodiff = 'Coupling_Electons_Potential_Ions_MeanEnergy_DependCoeff_NonLog_out.e'
+    group = 'MMS_kernels_NonLog'
+  [../]
+  [./Coupling_Electons_Potential_Ions_MeanEnergy]
+    type = 'Exodiff'
+    input = 'Coupling_Electons_Potential_Ions_MeanEnergy_NonLog.i'
+    exodiff = 'Coupling_Electons_Potential_Ions_MeanEnergy_NonLog_out.e'
+    group = 'MMS_kernels_NonLog'
+  [../]
+  [./Coupling_Electons_Potential_Ions]
+    type = 'Exodiff'
+    input = 'Coupling_Electons_Potential_Ions_NonLog.i'
+    exodiff = 'Coupling_Electons_Potential_Ions_NonLog_out.e'
+    group = 'MMS_kernels_NonLog'
+  [../]
+  [./Coupling_Electons_Potential]
+    type = 'Exodiff'
+    input = 'Coupling_Electons_Potential_NonLog.i'
+    exodiff = 'Coupling_Electons_Potential_NonLog_out.e'
+    group = 'MMS_kernels_NonLog'
+  [../]
+  [./Single_Fluid_Diffusion_Advection_NonLog]
+    type = 'Exodiff'
+    input = 'Single_Fluid_Diffusion_Advection_NonLog.i'
+    exodiff = 'Single_Fluid_Diffusion_Advection_NonLog_out.e'
+    group = 'MMS_kernels_NonLog'
+  [../]
+  [./Single_Fluid_Diffusion_NonLog]
+    type = 'Exodiff'
+    input = 'Single_Fluid_Diffusion_NonLog.i'
+    exodiff = 'Single_Fluid_Diffusion_NonLog_out.e'
+    group = 'MMS_kernels_NonLog'
+  [../]
+[]

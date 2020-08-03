@@ -1,0 +1,31 @@
+[Tests]
+  [./LymberopoulosElectronBC_LeftBC]
+    type = 'Exodiff'
+    input = 'LymberopoulosElectronBC_Coupled_NonLog.i'
+    exodiff = 'LymberopoulosElectronBC_LeftBC_out.e'
+    group = 'MMS_bcs_NonLog'
+  [../]
+
+  [./LymberopoulosElectronBC_RightBC]
+    type = 'Exodiff'
+    input = 'LymberopoulosElectronBC_Coupled_NonLog.i'
+    exodiff = 'LymberopoulosElectronBC_RightBC_out.e'
+    cli_args = "Outputs/file_base='LymberopoulosElectronBC_RightBC_out' BCs/active='potential_left_BC potential_right_BC ion_left_BC ion_right_BC em_left_BC em_right_LymberopoulosElectronBC'"
+    group = 'MMS_bcs_NonLog'
+  [../]
+
+  [./LymberopoulosIonBC_LeftBC]
+    type = 'Exodiff'
+    input = 'LymberopoulosIonBC_Coupled_NonLog.i'
+    exodiff = 'LymberopoulosIonBC_LeftBC_out.e'
+    group = 'MMS_bcs_NonLog'
+  [../]
+
+  [./LymberopoulosIonBC_RightBC]
+    type = 'Exodiff'
+    input = 'LymberopoulosIonBC_Coupled_NonLog.i'
+    exodiff = 'LymberopoulosIonBC_RightBC_out.e'
+    cli_args = "Outputs/file_base='LymberopoulosIonBC_RightBC_out' BCs/active='potential_left_BC potential_right_BC ion_left_BC ion_right_LymberopoulosIonBC'"
+    group = 'MMS_bcs_NonLog'
+  [../]
+[]
