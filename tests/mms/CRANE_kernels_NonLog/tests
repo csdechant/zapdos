@@ -1,0 +1,30 @@
+[Tests]
+  [./Coupling_EEDFReaction]
+    type = 'Exodiff'
+    input = 'Coupling_EEDFReaction.i'
+    exodiff = 'Coupling_EEDFReaction_out.e'
+    group = 'CRANE_kernels'
+  [../]
+
+  [./Coupling_EEDFReaction_EEDFEnergy]
+    type = 'Exodiff'
+    input = 'Coupling_EEDFReaction_EEDFEnergy.i'
+    exodiff = 'Coupling_EEDFReaction_EEDFEnergy_out.e'
+    group = 'CRANE_kernels'
+  [../]
+
+  [./Coupling_EEDFElastic]
+    type = 'Exodiff'
+    input = 'Coupling_EEDFElastic.i'
+    exodiff = 'Coupling_EEDFElastic_out.e'
+    group = 'CRANE_kernels'
+  [../]
+
+  [./Coupling_EEDFElastic_UsingTempDiff]
+    type = 'Exodiff'
+    input = 'Coupling_EEDFElastic.i'
+    exodiff = 'Coupling_EEDFElastic_UsingTempDiff_out.e'
+    cli_args = "Outputs/file_base='Coupling_EEDFElastic_UsingTempDiff_out' Kernels/mean_en_elastic_reaction/use_temp_diff='true' Kernels/mean_en_source/function='energy_source_2'"
+    group = 'CRANE_kernels_'
+  [../]
+[]
