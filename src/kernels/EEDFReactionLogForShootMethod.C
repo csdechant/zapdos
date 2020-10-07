@@ -56,7 +56,7 @@ EEDFReactionLogForShootMethod::EEDFReactionLogForShootMethod(const InputParamete
 
 Real
 EEDFReactionLogForShootMethod::computeQpResidual()
-{
+{       
   return -_test[_i][_qp] * _stoichiometric_coeff * _reaction_coeff[_qp] * 1.0 *
          std::exp(_electron[_qp]) * _u[_qp];
 }

@@ -690,6 +690,9 @@ dom0Scale=1.0
   petsc_options = '-snes_converged_reason -snes_linesearch_monitor'
   petsc_options_iname = '-pc_type -pc_factor_shift_type -pc_factor_shift_amount -ksp_type -snes_linesearch_minlambda'
   petsc_options_value = 'lu NONZERO 1.e-10 fgmres 1e-3'
+
+  l_tol = 1e-07
+  nl_rel_tol = 1e-10
 []
 
 [Outputs]
