@@ -47,5 +47,8 @@ protected:
   const ADVariableValue & _em;
   const ADVariableValue & _mean_en;
 
+  Real _user_muem;
+  Real _user_diffem;
+
   Real actual_mean_en;
 };

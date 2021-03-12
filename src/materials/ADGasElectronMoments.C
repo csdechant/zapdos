@@ -25,6 +25,8 @@ ADGasElectronMoments::validParams()
       "property_tables_file", "The file containing interpolation tables for material properties.");
 
   params.addParam<Real>("time_units", 1, "Units of time");
+  params.addParam<Real>("user_electron_mobility", 0.0, "The electron mobility coefficient.");
+  params.addParam<Real>("user_electron_diffusion_coeff", 0.0, "The electron diffusion coefficient.");
   params.addRequiredCoupledVar("em",
                                "Species concentration needed to calculate the poisson source");
   params.addRequiredCoupledVar("mean_en", "The electron mean energy in log form.");
@@ -47,7 +49,10 @@ ADGasElectronMoments::ADGasElectronMoments(const InputParameters & parameters)
     _sgnmean_en(declareProperty<Real>("sgnmean_en")),
     _sgnem(declareProperty<Real>("sgnem")),
     _em(adCoupledValue("em")),
-    _mean_en(adCoupledValue("mean_en"))
+    _mean_en(adCoupledValue("mean_en")),
+
+    _user_muem(getParam<Real>("user_electron_mobility")),
+    _user_diffem(getParam<Real>("user_electron_diffusion_coeff"))
 {
   if (_potential_units.compare("V") == 0)
     _voltage_scaling = 1.;
@@ -94,19 +99,40 @@ ADGasElectronMoments::computeQpProperties()
 
   // For interpolated values the derivative propagation needs to be explicitly defined.
 
-  // Electron diffusion coefficient - value and derivatives
-  _diffem[_qp].value() = _diff_interpolation.sample(actual_mean_en) * _time_units;
+  if (_user_muem == 0.0)
+  {
+    // Electron mobility - value and derivatives
+    _muem[_qp].value() = _mu_interpolation.sample(actual_mean_en) * _voltage_scaling * _time_units;
 
-  _diffem[_qp].derivatives() = _diff_interpolation.sampleDerivative(actual_mean_en) *
-                               actual_mean_en *
-                               (_mean_en[_qp].derivatives() - _em[_qp].derivatives()) * _time_units;
+    _muem[_qp].derivatives() = _mu_interpolation.sampleDerivative(actual_mean_en) * actual_mean_en *
+                               (_mean_en[_qp].derivatives() - _em[_qp].derivatives()) *
+                               _voltage_scaling * _time_units;
+  }
+  else
+  {
+    // Electron mobility - value and derivatives
+    _muem[_qp].value() = _user_muem * _voltage_scaling * _time_units;
 
-  // Electron mobility - value and derivatives
-  _muem[_qp].value() = _mu_interpolation.sample(actual_mean_en) * _voltage_scaling * _time_units;
+    _muem[_qp].derivatives() = 0.0;
+  }
 
-  _muem[_qp].derivatives() = _mu_interpolation.sampleDerivative(actual_mean_en) * actual_mean_en *
-                             (_mean_en[_qp].derivatives() - _em[_qp].derivatives()) *
-                             _voltage_scaling * _time_units;
+  if (_user_diffem == 0.0)
+  {
+    // Electron diffusion coefficient - value and derivatives
+    _diffem[_qp].value() = _diff_interpolation.sample(actual_mean_en) * _time_units;
+
+    _diffem[_qp].derivatives() = _diff_interpolation.sampleDerivative(actual_mean_en) *
+                                 actual_mean_en *
+                                 (_mean_en[_qp].derivatives() - _em[_qp].derivatives()) * _time_units;
+  }
+  else
+  {
+    // Electron diffusion coefficient - value and derivatives
+    _diffem[_qp].value() = _user_diffem * _time_units;
+
+    _diffem[_qp].derivatives() = 0.0;
+
+  }
 
   // Mean electron energy diffusivity and mobility:
   _diffmean_en[_qp].value() = 5.0 / 3.0 * _diffem[_qp].value();
