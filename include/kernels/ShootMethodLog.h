@@ -31,5 +31,4 @@ protected:
   const VariableValue & _density_at_end_cycle;
   const VariableValue & _sensitivity;
   Real _limit;
-  Real _acceleration;
 };
