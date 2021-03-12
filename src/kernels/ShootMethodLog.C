@@ -57,8 +57,7 @@ ShootMethodLog::ShootMethodLog(const InputParameters & parameters)
     _density_at_start_cycle(coupledValue("density_at_start_cycle")),
     _density_at_end_cycle(coupledValue("density_at_end_cycle")),
     _sensitivity(coupledValue("sensitivity_variable")),
-    _limit(getParam<Real>("growth_limit")),
-    _acceleration(0.0)
+    _limit(1. / getParam<Real>("growth_limit"))
 {
 }
 
@@ -67,30 +66,12 @@ ShootMethodLog::~ShootMethodLog() {}
 Real
 ShootMethodLog::computeQpResidual()
 {
-
-  Real _acceleration_growth = std::pow((1. - _sensitivity[_qp]), -1.);
-
-  if (_limit == 0.0)
-  {
-    _acceleration = _acceleration_growth *
-                    (std::exp(_density_at_start_cycle[_qp]) - std::exp(_density_at_end_cycle[_qp]));
-  }
-  else
-  {
-    if (_acceleration_growth > _limit)
-    {
-      _acceleration =
-          _limit * (std::exp(_density_at_start_cycle[_qp]) - std::exp(_density_at_end_cycle[_qp]));
-    }
-    else
-    {
-      _acceleration = _acceleration_growth * (std::exp(_density_at_start_cycle[_qp]) -
-                                              std::exp(_density_at_end_cycle[_qp]));
-    }
-  }
+  Real Scaling = 1.0 / ((1. - _sensitivity[_qp]) + _limit);
 
   return _test[_i][_qp] *
-         (std::exp(_u[_qp]) - std::exp(_density_at_start_cycle[_qp]) + _acceleration);
+         (std::exp(_u[_qp]) - std::exp(_density_at_start_cycle[_qp]) +
+           (std::exp(_density_at_start_cycle[_qp]) -
+            std::exp(_density_at_end_cycle[_qp])) * Scaling);
 }
 
 Real
