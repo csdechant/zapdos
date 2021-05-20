@@ -62,7 +62,7 @@ LymberopoulosIonBC::computeQpOffDiagJacobian(unsigned int jvar)
   if (jvar == _potential_id)
   {
 
-    return _test[_i][_qp] * _r_units * _mu[_qp] * _grad_phi[_j][_qp] * _r_units *
+    return _test[_i][_qp] * _r_units * _mu[_qp] * -_grad_phi[_j][_qp] * _r_units *
            std::exp(_u[_qp]) * _normals[_qp];
   }
 
