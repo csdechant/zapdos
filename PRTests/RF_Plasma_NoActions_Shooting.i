@@ -60,8 +60,6 @@ dom0Scale=25.4e-3
     density_at_start_cycle = Ar*S
     density_at_end_cycle = Ar*T
     sensitivity_variable = SM_Ar*
-    #growth_limit = 100
-    #growth_limit = 200
     growth_limit = 100
   [../]
 []
@@ -138,14 +136,6 @@ dom0Scale=25.4e-3
 
 [Outputs]
   print_perf_log = true
-  #[./out_NONLINEAR]
-  #  type = Exodus
-  #  execute_on = 'NONLINEAR'
-  #[../]
-  #[./out_LINEAR]
-  #  type = Exodus
-  #  execute_on = 'LINEAR'
-  #[../]
   [./out]
     type = Exodus
   [../]

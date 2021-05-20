@@ -112,11 +112,11 @@ dom0Scale=25.4e-3
 []
 
 [Outputs]
-  print_perf_log = true
-  [./out_NONLINEAR]
-    type = Exodus
-    execute_on = 'NONLINEAR'
-  [../]
+  #print_perf_log = true
+  #[./out_NONLINEAR]
+  #  type = Exodus
+  #  execute_on = 'NONLINEAR'
+  #[../]
   #[./out_LINEAR]
   #  type = Exodus
   #  execute_on = 'LINEAR'

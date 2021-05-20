@@ -56,6 +56,9 @@ protected:
   const VariableValue & _du_dot_du;
 
   const MaterialProperty<Real> & _e;
+  const MaterialProperty<Real> & _epsilon_0;
+  const MaterialProperty<Real> & _N_A;
+
   const MaterialProperty<Real> & _sgnip;
   const MaterialProperty<Real> & _muip;
   const MaterialProperty<Real> & _massem;

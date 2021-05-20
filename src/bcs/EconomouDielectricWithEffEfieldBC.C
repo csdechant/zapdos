@@ -64,6 +64,9 @@ EconomouDielectricWithEffEfieldBC::EconomouDielectricWithEffEfieldBC(const Input
     _du_dot_du(_var.duDotDu()),
 
     _e(getMaterialProperty<Real>("e")),
+    _epsilon_0(getMaterialProperty<Real>("NonAD_diff" + _var.name())),
+    _N_A(getMaterialProperty<Real>("N_A")),
+
     _sgnip(getMaterialProperty<Real>("sgn" + _ip_var.name())),
     _muip(getMaterialProperty<Real>("NonAD_mu" + _ip_var.name())),
     _massem(getMaterialProperty<Real>("massem")),
@@ -94,6 +97,148 @@ EconomouDielectricWithEffEfieldBC::EconomouDielectricWithEffEfieldBC(const Input
     _voltage_scaling = 1000;
 }
 
+
+
+Real
+EconomouDielectricWithEffEfieldBC::computeQpResidual()
+{
+  RealVectorValue EField(_Ex[_qp], _Ey[_qp], _Ez[_qp]);
+
+  if (_normals[_qp] * _sgnip[_qp] * EField >= 0.0)
+  {
+    _a = 1.0;
+  }
+  else
+  {
+    _a = 0.0;
+  }
+
+  _ion_flux =
+      (_a * _sgnip[_qp] * _muip[_qp] * EField * _r_units * std::exp(_ip[_qp]));
+
+  _v_thermal =
+      std::sqrt(8 * _e[_qp] * 2.0 / 3 * std::exp(_mean_en[_qp] - _em[_qp]) / (M_PI * _massem[_qp]));
+
+  _em_flux =
+      (0.25 * _v_thermal * std::exp(_em[_qp]) * _normals[_qp]) - (_user_se_coeff * _ion_flux);
+
+  RealVectorValue Esum = _epsilon_0[_qp] * -_grad_u_dot[_qp] * _r_units -
+                        (_epsilon_d / _thickness) * _u_dot[_qp] * _normals[_qp];
+
+  return _test[_i][_qp] * _r_units * _normals[_qp] *
+         (_e[_qp] * _N_A[_qp] / _voltage_scaling  * (_ion_flux - _em_flux) +
+          Esum);
+}
+
+Real
+EconomouDielectricWithEffEfieldBC::computeQpJacobian()
+{
+
+  RealVectorValue d_Esum_du = _epsilon_0[_qp] * _du_dot_du[_qp] * -_grad_phi[_j][_qp] * _r_units -
+                             (_epsilon_d / _thickness) * _du_dot_du[_qp] * _phi[_j][_qp] * _normals[_qp];
+
+  return _test[_i][_qp] * _r_units * _normals[_qp] * d_Esum_du;
+}
+
+Real
+EconomouDielectricWithEffEfieldBC::computeQpOffDiagJacobian(unsigned int jvar)
+{
+  if (jvar == _mean_en_id)
+  {
+    _v_thermal = std::sqrt(8 * _e[_qp] * 2.0 / 3 * std::exp(_mean_en[_qp] - _em[_qp]) /
+                           (M_PI * _massem[_qp]));
+
+    _d_v_thermal_d_mean_en = 0.5 / _v_thermal * 8 * _e[_qp] * 2.0 / 3 *
+                             std::exp(_mean_en[_qp] - _em[_qp]) / (M_PI * _massem[_qp]) *
+                             _phi[_j][_qp];
+
+    _d_em_flux_d_mean_en = (0.25 * _d_v_thermal_d_mean_en * std::exp(_em[_qp]) * _normals[_qp]);
+
+    return _test[_i][_qp] * _r_units * _normals[_qp] *
+           (-_e[_qp] * _N_A[_qp]  / _voltage_scaling * _d_em_flux_d_mean_en);
+  }
+
+  else if (jvar == _em_id)
+  {
+    _v_thermal = std::sqrt(8 * _e[_qp] * 2.0 / 3 * std::exp(_mean_en[_qp] - _em[_qp]) /
+                           (M_PI * _massem[_qp]));
+
+    _d_v_thermal_d_em = 0.5 / _v_thermal * 8 * _e[_qp] * 2.0 / 3 *
+                        std::exp(_mean_en[_qp] - _em[_qp]) / (M_PI * _massem[_qp]) * -_phi[_j][_qp];
+
+    _d_em_flux_d_em = (0.25 * _d_v_thermal_d_em * std::exp(_em[_qp]) +
+                       0.25 * _v_thermal * std::exp(_em[_qp]) * _phi[_j][_qp]) * _normals[_qp];
+
+    return _test[_i][_qp] * _r_units * _normals[_qp] *
+           (-_e[_qp] * _N_A[_qp] / _voltage_scaling * _d_em_flux_d_em);
+  }
+
+  else if (jvar == _ip_id)
+  {
+    RealVectorValue EField(_Ex[_qp], _Ey[_qp], _Ez[_qp]);
+
+    if (_normals[_qp] * _sgnip[_qp] * EField >= 0.0)
+    {
+      _a = 1.0;
+    }
+    else
+    {
+      _a = 0.0;
+    }
+
+    _d_ion_flux_d_ip = (_a * _sgnip[_qp] * _muip[_qp] * EField * _r_units *
+                        std::exp(_ip[_qp]) * _phi[_j][_qp]);
+
+    _d_em_flux_d_ip = -_user_se_coeff * _d_ion_flux_d_ip;
+
+    return _test[_i][_qp] * _r_units * _normals[_qp] *
+           _e[_qp] * _N_A[_qp] / _voltage_scaling * (_d_ion_flux_d_ip - _d_em_flux_d_ip);
+  }
+
+  else if (jvar == _Ex_id || jvar == _Ey_id || jvar == _Ez_id)
+  {
+    RealVectorValue EField(_Ex[_qp], _Ey[_qp], _Ez[_qp]);
+    RealVectorValue d_EField_d_comp(0, 0, 0);
+
+    //_d_ion_flux_d_Efield.zero();
+    //_d_em_flux_d_Efield.zero();
+
+    int comp = 4;
+    if (jvar == _Ex_id)
+      comp = 0;
+    if (jvar == _Ey_id)
+      comp = 1;
+    if (jvar == _Ez_id)
+      comp = 2;
+
+    if (_normals[_qp] * _sgnip[_qp] * EField >= 0.0)
+    {
+      _a = 1.0;
+    }
+    else
+    {
+      _a = 0.0;
+    }
+
+    d_EField_d_comp(comp) = _phi[_j][_qp];
+
+    _d_ion_flux_d_Efield =
+        (_a * _sgnip[_qp] * _muip[_qp] * d_EField_d_comp * _r_units * std::exp(_ip[_qp]));
+
+    _d_em_flux_d_Efield = -_user_se_coeff * _d_ion_flux_d_Efield;
+
+    return _test[_i][_qp] * _r_units * _normals[_qp] *
+           _e[_qp] * _N_A[_qp] / _voltage_scaling * (_d_ion_flux_d_Efield - _d_em_flux_d_Efield);
+  }
+
+  else
+    return 0.0;
+}
+
+
+
+
+/*
 Real
 EconomouDielectricWithEffEfieldBC::computeQpResidual()
 {
@@ -118,8 +263,8 @@ EconomouDielectricWithEffEfieldBC::computeQpResidual()
       (0.25 * _v_thermal * std::exp(_em[_qp]) * _normals[_qp]) - (_user_se_coeff * _ion_flux);
 
   return _test[_i][_qp] * _r_units *
-         (_e[_qp] * 6.022e23 * (_ion_flux - _em_flux) * _normals[_qp] / _voltage_scaling +
-         8.8542e-12 * -_grad_u_dot[_qp] * _r_units * _normals[_qp] -
+         (_e[_qp] * _N_A[_qp] * (_ion_flux - _em_flux) * _normals[_qp] / _voltage_scaling +
+         _epsilon_0[_qp] * -_grad_u_dot[_qp] * _r_units * _normals[_qp] -
          (_epsilon_d / _thickness) * _u_dot[_qp]);
 }
 
@@ -128,7 +273,7 @@ EconomouDielectricWithEffEfieldBC::computeQpJacobian()
 {
 
   return _test[_i][_qp] * _r_units *
-         (8.8542e-12 * _du_dot_du[_qp] * -_grad_phi[_j][_qp] * _r_units * _normals[_qp] -
+         (_epsilon_0[_qp] * _du_dot_du[_qp] * -_grad_phi[_j][_qp] * _r_units * _normals[_qp] -
          (_epsilon_d / _thickness) * _du_dot_du[_qp] * _phi[_j][_qp]);
 }
 
@@ -147,7 +292,7 @@ EconomouDielectricWithEffEfieldBC::computeQpOffDiagJacobian(unsigned int jvar)
     _d_em_flux_d_mean_en = (0.25 * _d_v_thermal_d_mean_en * std::exp(_em[_qp]) * _normals[_qp]);
 
     return _test[_i][_qp] * _r_units *
-           (-_e[_qp] * 6.022e23 * _d_em_flux_d_mean_en) * _normals[_qp] / _voltage_scaling;
+           (-_e[_qp] * _N_A[_qp] * _d_em_flux_d_mean_en) * _normals[_qp] / _voltage_scaling;
   }
 
   else if (jvar == _em_id)
@@ -161,7 +306,7 @@ EconomouDielectricWithEffEfieldBC::computeQpOffDiagJacobian(unsigned int jvar)
     _d_em_flux_d_em = (0.25 * _d_v_thermal_d_em * std::exp(_em[_qp]) +
                        0.25 * _v_thermal * std::exp(_em[_qp]) * _phi[_j][_qp]) * _normals[_qp];
 
-    return _test[_i][_qp] * _r_units * (-_e[_qp] * 6.022e23 * _d_em_flux_d_em) *
+    return _test[_i][_qp] * _r_units * (-_e[_qp] * _N_A[_qp] * _d_em_flux_d_em) *
            _normals[_qp] / _voltage_scaling;
   }
 
@@ -184,7 +329,7 @@ EconomouDielectricWithEffEfieldBC::computeQpOffDiagJacobian(unsigned int jvar)
     _d_em_flux_d_ip = -_user_se_coeff * _d_ion_flux_d_ip;
 
     return _test[_i][_qp] * _r_units *
-           _e[_qp] * 6.022e23 * (_d_ion_flux_d_ip - _d_em_flux_d_ip) * _normals[_qp] /
+           _e[_qp] * _N_A[_qp] * (_d_ion_flux_d_ip - _d_em_flux_d_ip) * _normals[_qp] /
            _voltage_scaling;
   }
 
@@ -221,10 +366,11 @@ EconomouDielectricWithEffEfieldBC::computeQpOffDiagJacobian(unsigned int jvar)
     _d_em_flux_d_Efield = -_user_se_coeff * _d_ion_flux_d_Efield;
 
     return _test[_i][_qp] * _r_units *
-           _e[_qp] * 6.022e23 * (_d_ion_flux_d_Efield - _d_em_flux_d_Efield) *
+           _e[_qp] * _N_A[_qp] * (_d_ion_flux_d_Efield - _d_em_flux_d_Efield) *
            _normals[_qp] / _voltage_scaling;
   }
 
   else
     return 0.0;
 }
+*/

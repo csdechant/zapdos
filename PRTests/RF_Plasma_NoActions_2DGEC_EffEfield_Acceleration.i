@@ -981,8 +981,8 @@ dom0Scale=25.4e-3
 
 [Executioner]
   type = Transient
-  #end_time = 1e-5
-  end_time = 4e-6
+  end_time = 1e-4
+  #end_time = 4e-6
 
   automatic_scaling = true
   compute_scaling_once = false

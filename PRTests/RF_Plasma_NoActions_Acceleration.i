@@ -864,8 +864,8 @@ dom0Scale=25.4e-3
 
 [Executioner]
   type = Transient
-  #end_time = 3.68732e-4 #5000 RF cycles
-  end_time = 4e-6
+  end_time = 3.68732e-4 #5000 RF cycles
+  #end_time = 4e-6
 
   solve_type = NEWTON
   line_search = none
