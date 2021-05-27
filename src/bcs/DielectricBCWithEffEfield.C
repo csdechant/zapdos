@@ -66,7 +66,7 @@ DielectricBCWithEffEfield::DielectricBCWithEffEfield(const InputParameters & par
     _Ez_old(isCoupled("Ez") ? _Ez_var.slnOld() : _zero),
 
     _e(getMaterialProperty<Real>("e")),
-    _epsilon_0(getMaterialProperty<Real>("diff" + _var.name())),
+    _epsilon_0(getADMaterialProperty<Real>("diff" + _var.name())),
     _N_A(getMaterialProperty<Real>("N_A")),
 
     _sgnip(getMaterialProperty<Real>("sgn" + _ip_var.name())),
