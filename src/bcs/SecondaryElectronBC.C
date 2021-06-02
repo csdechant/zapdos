@@ -47,7 +47,6 @@ SecondaryElectronBC::SecondaryElectronBC(const InputParameters & parameters)
 
     _electric_field(
         getADMaterialProperty<RealVectorValue>(getParam<std::string>("field_property_name")))
-
 {
   _ion_flux = 0;
   _a = 0.5;
