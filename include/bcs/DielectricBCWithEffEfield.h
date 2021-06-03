@@ -51,7 +51,7 @@ protected:
   const VariableValue & _Ez_old;
 
   const MaterialProperty<Real> & _e;
-  const MaterialProperty<Real> & _epsilon_0;
+  const ADMaterialProperty<Real> & _epsilon_0;
   const MaterialProperty<Real> & _N_A;
 
   const MaterialProperty<Real> & _sgnip;
