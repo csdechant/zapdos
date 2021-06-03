@@ -656,7 +656,9 @@ dom0Scale=25.4e-3
     diffusivity = 7.515528e-3
   [../]
   [./reaction_0]
-    type = ADZapdosEEDFRateLinearInterpolation
+    #type = ADZapdosEEDFRateLinearInterpolation
+    type = InterpolatedCoefficientLinear
+    #type = ADZapdosEEDFRateConstant
     mean_energy = mean_en
     property_file = 'Argon_reactions_RateCoefficients/reaction_em + Ar -> em + Ar*.txt'
     reaction = 'em + Ar -> em + Ar*'
@@ -664,7 +666,9 @@ dom0Scale=25.4e-3
     electrons = em
   [../]
   [./reaction_1]
-    type = ADZapdosEEDFRateLinearInterpolation
+    #type = ADZapdosEEDFRateLinearInterpolation
+    type = InterpolatedCoefficientLinear
+    #type = ADZapdosEEDFRateConstant
     mean_energy = mean_en
     property_file = 'Argon_reactions_RateCoefficients/reaction_em + Ar -> em + em + Ar+.txt'
     reaction = 'em + Ar -> em + em + Ar+'
@@ -672,7 +676,9 @@ dom0Scale=25.4e-3
     electrons = em
   [../]
   [./reaction_2]
-    type = ADZapdosEEDFRateLinearInterpolation
+    #type = ADZapdosEEDFRateLinearInterpolation
+    type = InterpolatedCoefficientLinear
+    #type = ADZapdosEEDFRateConstant
     mean_energy = mean_en
     property_file = 'Argon_reactions_RateCoefficients/reaction_em + Ar* -> em + Ar.txt'
     reaction = 'em + Ar* -> em + Ar'
@@ -680,7 +686,9 @@ dom0Scale=25.4e-3
     electrons = em
   [../]
   [./reaction_3]
-    type = ADZapdosEEDFRateLinearInterpolation
+    #type = ADZapdosEEDFRateLinearInterpolation
+    type = InterpolatedCoefficientLinear
+    #type = ADZapdosEEDFRateConstant
     mean_energy = mean_en
     property_file = 'Argon_reactions_RateCoefficients/reaction_em + Ar* -> em + em + Ar+.txt'
     reaction = 'em + Ar* -> em + em + Ar+'
