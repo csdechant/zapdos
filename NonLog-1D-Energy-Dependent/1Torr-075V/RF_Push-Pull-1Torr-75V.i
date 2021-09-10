@@ -957,8 +957,8 @@ dom0Scale=25.4e-3
 
 [Executioner]
   type = Transient
-  #end_time = 3.6873e-4 #~5000 RF cycles
-  end_time = 1e-5
+  end_time = 3.6873e-4 #~5000 RF cycles
+  #end_time = 1e-5
   solve_type = NEWTON
   line_search = none
   petsc_options = '-snes_converged_reason -snes_linesearch_monitor'
