@@ -58,7 +58,7 @@ PlasmaDielectricConstant::computeQpProperties()
   // Calculate the gradient of the plasma dielectric constant
   ADReal grad_const = -pow(omega_pe, 2) / (pow(2 * _pi * _frequency, 2) + pow(2 * _pi * _nu, 2));
   _eps_r_real_grad[_qp] = grad_const * _em_grad[_qp];
-  _eps_r_imag_grad[_qp] = (grad_const * 2 * _pi * _nu / (2 * _pi * _frequency)) * _em_grad[_qp];
+  _eps_r_imag_grad[_qp] = (grad_const * _nu / (2 * _pi * _frequency)) * _em_grad[_qp];
 
   if (_fe_problem.isTransient())
   {
