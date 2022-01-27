@@ -16,7 +16,6 @@ This acceleration scheme is used in paper
 DOI: https://doi.org/10.1116/1.587101, with a more
 detailed description in papr DOI:
 https://doi.org/10.1016/0009-2509(92)85133-V.
-
 This method assumes a periodic solution and uses
 that assumption to accelerate to the simulation.
 This is done by converting the periodic solution
@@ -53,8 +52,7 @@ ShootMethodLog::ShootMethodLog(const InputParameters & parameters)
     _density_at_start_cycle(adCoupledValue("density_at_start_cycle")),
     _density_at_end_cycle(adCoupledValue("density_at_end_cycle")),
     _sensitivity(adCoupledValue("sensitivity_variable")),
-    _limit(getParam<Real>("growth_limit")),
-    _acceleration(0.0)
+    _limit(getParam<Real>("growth_limit"))
 {
 }
 
@@ -62,27 +60,10 @@ ADReal
 ShootMethodLog::computeQpResidual()
 {
 
-  ADReal _acceleration_growth = std::pow((1. - _sensitivity[_qp]), -1.);
-
-  if (_limit == 0.0)
-  {
-    _acceleration = _acceleration_growth *
-                    (std::exp(_density_at_start_cycle[_qp]) - std::exp(_density_at_end_cycle[_qp]));
-  }
-  else
-  {
-    if (_acceleration_growth > _limit)
-    {
-      _acceleration =
-          _limit * (std::exp(_density_at_start_cycle[_qp]) - std::exp(_density_at_end_cycle[_qp]));
-    }
-    else
-    {
-      _acceleration = _acceleration_growth * (std::exp(_density_at_start_cycle[_qp]) -
-                                              std::exp(_density_at_end_cycle[_qp]));
-    }
-  }
+  ADReal Scaling = 1.0 / ((1. - _sensitivity[_qp]) + (1. / _limit));
 
   return _test[_i][_qp] *
-         (std::exp(_u[_qp]) - std::exp(_density_at_start_cycle[_qp]) + _acceleration);
+         (std::exp(_u[_qp]) - std::exp(_density_at_start_cycle[_qp]) +
+           (std::exp(_density_at_start_cycle[_qp]) -
+            std::exp(_density_at_end_cycle[_qp])) * Scaling);
 }
