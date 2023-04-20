@@ -998,4 +998,9 @@ dom1Scale = 1e-7
     potential = potential
     block = 1
   []
+  [water_field_solver]
+    type = FieldSolverMaterial
+    potential = potential
+    block = 1
+  []
 []
