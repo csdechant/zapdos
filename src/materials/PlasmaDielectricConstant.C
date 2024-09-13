@@ -6,8 +6,11 @@ InputParameters
 PlasmaDielectricConstant::validParams()
 {
   InputParameters params = ADMaterial::validParams();
-  params.addRequiredParam<Real>("electron_neutral_collision_frequency",
-                                "The electron-neutral collision frequency (in Hz).");
+  params.addRequiredParam<MaterialPropertyName>(
+      "electron_neutral_collision_frequency", "The electron-neutral collision frequency (in Hz).");
+  params.addRequiredParam<MaterialPropertyName>(
+      "electron_neutral_collision_frequency_gradient",
+      "The gradient electron-neutral collision frequency (in Hz).");
   params.addRequiredParam<Real>("driving_frequency", "Driving frequency of plasma (in Hz).");
   params.addCoupledVar("electrons", "The electron density in log form");
   params.addClassDescription("Provides the real and complex components, the spatial gradient and "
@@ -29,13 +32,23 @@ PlasmaDielectricConstant::PlasmaDielectricConstant(const InputParameters & param
     _electron_mass(9.1095e-31),
     _eps_vacuum(8.8542e-12),
     _pi(libMesh::pi),
-    _nu(getParam<Real>("electron_neutral_collision_frequency")),
+
+    _nu(getADMaterialProperty<Real>("electron_neutral_collision_frequency")),
+    _grad_nu(
+        getADMaterialProperty<RealVectorValue>("electron_neutral_collision_frequency_gradient")),
+
     _frequency(getParam<Real>("driving_frequency")),
     _em(adCoupledValue("electrons")),
     _em_grad(adCoupledGradient("electrons")),
     _em_var(getVar("electrons", 0)),
     _em_dot(_fe_problem.isTransient() ? _em_var->adUDot() : _ad_zero),
-    _em_dot_dot(_fe_problem.isTransient() ? _em_var->adUDotDot() : _ad_zero)
+    _em_dot_dot(_fe_problem.isTransient() ? _em_var->adUDotDot() : _ad_zero),
+
+    _N_A(getMaterialProperty<Real>("N_A")),
+    _eps(getMaterialProperty<Real>("eps")),
+    _sigma_pe_real(declareADProperty<Real>("plasma_conductivity_real")),
+    _sigma_pe_imag(declareADProperty<Real>("plasma_conductivity_imag"))
+
 {
 }
 
