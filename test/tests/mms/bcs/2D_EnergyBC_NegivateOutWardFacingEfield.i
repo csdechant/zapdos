@@ -13,7 +13,7 @@
 [Mesh]
   [./geo]
     type = FileMeshGenerator
-    file = '2D_EnergyBC_IC_out.e'
+    file = '2D_EnergyBC_NegivateOutWardFacingEfield_IC_out.e'
     use_for_exodus_restart = true
   [../]
 []
@@ -145,7 +145,6 @@
   [./mean_en_advection]
     type = EFieldAdvection
     variable = mean_en
-    potential = 'potential'
     position_units = 1.0
   [../]
   [./mean_en_source]
@@ -269,7 +268,7 @@
     vars = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
     vals = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
     value = 'log(((16*ee*(sin(pi*x) + sin(pi*y) + (cos(pi*y)*sin(2*pi*t))/5 + 1)^3)/(3*massem*pi*((12*diffmean_en*pi)/5 +
-                 (32*mumean_en*pi*(sin(t*pi) + 1)*(sin(x*pi) + sin(y*pi) + (cos(y*pi)*sin(2*t*pi))/5 + 1))/5)^2)) / N_A)'
+                 (12*mumean_en*pi*(sin(t*pi) + 1)*(sin(x*pi) + sin(y*pi) + (cos(y*pi)*sin(2*t*pi))/5 + 1))/5)^2)) / N_A)'
   [../]
   #The manufactured ion density solution
   [./ion_fun]
@@ -290,13 +289,13 @@
     type = ParsedFunction
     vars = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
     vals = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
-    value = '-pi*cos(pi*x)*(sin(pi*t) + 1)'
+    value = 'pi*cos(pi*x)*(sin(pi*t) + 1)'
   [../]
   [./Ey_fun]
     type = ParsedFunction
     vars = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
     vals = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
-    value = '-pi*cos(pi*y)*(sin(pi*t) + 1)'
+    value = 'pi*cos(pi*y)*(sin(pi*t) + 1)'
   [../]
   #The manufactured potential solution
   [./potential_fun]
@@ -312,33 +311,39 @@
     type = ParsedFunction
     vars = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
     vals = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
-    value = '((32*ee*cos(2*pi*t)*cos(pi*y)*(sin(pi*x) + sin(pi*y) + (cos(pi*y)*sin(2*pi*t))/5 + 1)^2)/(5*massem*((12*diffmean_en*pi)/5 +
-              (32*mumean_en*pi*(sin(t*pi) + 1)*(sin(x*pi) + sin(y*pi) + (cos(y*pi)*sin(2*t*pi))/5 + 1))/5)^2) -
-              diffem*((32*ee*(pi*cos(pi*y) - (pi*sin(2*pi*t)*sin(pi*y))/5)^2*(sin(pi*x) + sin(pi*y) +
-              (cos(pi*y)*sin(2*pi*t))/5 + 1))/(massem*pi*((12*diffmean_en*pi)/5 +
-              (32*mumean_en*pi*(sin(t*pi) + 1)*(sin(x*pi) + sin(y*pi) + (cos(y*pi)*sin(2*t*pi))/5 + 1))/5)^2) -
-              (16*ee*(pi^2*sin(pi*y) + (pi^2*cos(pi*y)*sin(2*pi*t))/5)*(sin(pi*x) + sin(pi*y) +
-              (cos(pi*y)*sin(2*pi*t))/5 + 1)^2)/(massem*pi*((12*diffmean_en*pi)/5 + (32*mumean_en*pi*(sin(t*pi) + 1)*(sin(x*pi) +
-              sin(y*pi) + (cos(y*pi)*sin(2*t*pi))/5 + 1))/5)^2) - (2048*ee*mumean_en*(pi*cos(pi*y) -
-              (pi*sin(2*pi*t)*sin(pi*y))/5)^2*(sin(pi*t) + 1)*(sin(pi*x) + sin(pi*y) + (cos(pi*y)*sin(2*pi*t))/5 + 1)^2)/(5*massem*((12*diffmean_en*pi)/5 +
-              (32*mumean_en*pi*(sin(t*pi) + 1)*(sin(x*pi) + sin(y*pi) + (cos(y*pi)*sin(2*t*pi))/5 + 1))/5)^3) + (1024*ee*mumean_en*(pi^2*sin(pi*y) +
-              (pi^2*cos(pi*y)*sin(2*pi*t))/5)*(sin(pi*t) + 1)*(sin(pi*x) + sin(pi*y) + (cos(pi*y)*sin(2*pi*t))/5 + 1)^3)/(15*massem*((12*diffmean_en*pi)/5 +
-              (32*mumean_en*pi*(sin(t*pi) + 1)*(sin(x*pi) + sin(y*pi) + (cos(y*pi)*sin(2*t*pi))/5 + 1))/5)^3) + (32768*ee*mumean_en^2*pi*(pi*cos(pi*y) -
+    value = '((32*ee*cos(2*pi*t)*cos(pi*y)*(sin(pi*x) + sin(pi*y) + (cos(pi*y)*sin(2*pi*t))/5 +
+              1)^2)/(5*massem*((12*diffmean_en*pi)/5 + (12*mumean_en*pi*(sin(t*pi) + 1)*(sin(x*pi) +
+              sin(y*pi) + (cos(y*pi)*sin(2*t*pi))/5 + 1))/5)^2) - diffem*((32*ee*(pi*cos(pi*y) -
+              (pi*sin(2*pi*t)*sin(pi*y))/5)^2*(sin(pi*x) + sin(pi*y) + (cos(pi*y)*sin(2*pi*t))/5 +
+              1))/(massem*pi*((12*diffmean_en*pi)/5 + (12*mumean_en*pi*(sin(t*pi) + 1)*(sin(x*pi) +
+              sin(y*pi) + (cos(y*pi)*sin(2*t*pi))/5 + 1))/5)^2) - (16*ee*(pi^2*sin(pi*y) +
+              (pi^2*cos(pi*y)*sin(2*pi*t))/5)*(sin(pi*x) + sin(pi*y) + (cos(pi*y)*sin(2*pi*t))/5 +
+              1)^2)/(massem*pi*((12*diffmean_en*pi)/5 + (12*mumean_en*pi*(sin(t*pi) + 1)*(sin(x*pi) +
+              sin(y*pi) + (cos(y*pi)*sin(2*t*pi))/5 + 1))/5)^2) - (768*ee*mumean_en*(pi*cos(pi*y) -
+              (pi*sin(2*pi*t)*sin(pi*y))/5)^2*(sin(pi*t) + 1)*(sin(pi*x) + sin(pi*y) +
+              (cos(pi*y)*sin(2*pi*t))/5 + 1)^2)/(5*massem*((12*diffmean_en*pi)/5 + (12*mumean_en*pi*(sin(t*pi) +
+              1)*(sin(x*pi) + sin(y*pi) + (cos(y*pi)*sin(2*t*pi))/5 + 1))/5)^3) + (128*ee*mumean_en*(pi^2*sin(pi*y) +
+              (pi^2*cos(pi*y)*sin(2*pi*t))/5)*(sin(pi*t) + 1)*(sin(pi*x) + sin(pi*y) + (cos(pi*y)*sin(2*pi*t))/5 +
+              1)^3)/(5*massem*((12*diffmean_en*pi)/5 + (12*mumean_en*pi*(sin(t*pi) + 1)*(sin(x*pi) + sin(y*pi) +
+              (cos(y*pi)*sin(2*t*pi))/5 + 1))/5)^3) + (4608*ee*mumean_en^2*pi*(pi*cos(pi*y) -
               (pi*sin(2*pi*t)*sin(pi*y))/5)^2*(sin(pi*t) + 1)^2*(sin(pi*x) + sin(pi*y) + (cos(pi*y)*sin(2*pi*t))/5 +
-              1)^3)/(25*massem*((12*diffmean_en*pi)/5 + (32*mumean_en*pi*(sin(t*pi) + 1)*(sin(x*pi) + sin(y*pi) + (cos(y*pi)*sin(2*t*pi))/5 + 1))/5)^4)) -
-              diffem*((32*ee*pi*cos(pi*x)^2*(sin(pi*x) + sin(pi*y) + (cos(pi*y)*sin(2*pi*t))/5 + 1))/(massem*((12*diffmean_en*pi)/5 +
-              (32*mumean_en*pi*(sin(t*pi) + 1)*(sin(x*pi) + sin(y*pi) + (cos(y*pi)*sin(2*t*pi))/5 + 1))/5)^2) - (16*ee*pi*sin(pi*x)*(sin(pi*x) +
-              sin(pi*y) + (cos(pi*y)*sin(2*pi*t))/5 + 1)^2)/(massem*((12*diffmean_en*pi)/5 + (32*mumean_en*pi*(sin(t*pi) + 1)*(sin(x*pi) +
-              sin(y*pi) + (cos(y*pi)*sin(2*t*pi))/5 + 1))/5)^2) - (2048*ee*mumean_en*pi^2*cos(pi*x)^2*(sin(pi*t) + 1)*(sin(pi*x) + sin(pi*y) +
-              (cos(pi*y)*sin(2*pi*t))/5 + 1)^2)/(5*massem*((12*diffmean_en*pi)/5 + (32*mumean_en*pi*(sin(t*pi) + 1)*(sin(x*pi) + sin(y*pi) +
-              (cos(y*pi)*sin(2*t*pi))/5 + 1))/5)^3) + (1024*ee*mumean_en*pi^2*sin(pi*x)*(sin(pi*t) + 1)*(sin(pi*x) + sin(pi*y) +
-              (cos(pi*y)*sin(2*pi*t))/5 + 1)^3)/(15*massem*((12*diffmean_en*pi)/5 + (32*mumean_en*pi*(sin(t*pi) + 1)*(sin(x*pi) + sin(y*pi) +
-              (cos(y*pi)*sin(2*t*pi))/5 + 1))/5)^3) + (32768*ee*mumean_en^2*pi^3*cos(pi*x)^2*(sin(pi*t) + 1)^2*(sin(pi*x) + sin(pi*y) +
-              (cos(pi*y)*sin(2*pi*t))/5 + 1)^3)/(25*massem*((12*diffmean_en*pi)/5 + (32*mumean_en*pi*(sin(t*pi) + 1)*(sin(x*pi) + sin(y*pi) +
-              (cos(y*pi)*sin(2*t*pi))/5 + 1))/5)^4)) - (32*ee*((32*mumean_en*pi^2*cos(pi*t)*(sin(pi*x) + sin(pi*y) +
-              (cos(pi*y)*sin(2*pi*t))/5 + 1))/5 + (64*mumean_en*pi^2*cos(2*pi*t)*cos(pi*y)*(sin(pi*t) + 1))/25)*(sin(pi*x) + sin(pi*y) +
-              (cos(pi*y)*sin(2*pi*t))/5 + 1)^3)/(3*massem*pi*((12*diffmean_en*pi)/5 + (32*mumean_en*pi*(sin(t*pi) + 1)*(sin(x*pi) +
-              sin(y*pi) + (cos(y*pi)*sin(2*t*pi))/5 + 1))/5)^3)) / N_A'
+              1)^3)/(25*massem*((12*diffmean_en*pi)/5 + (12*mumean_en*pi*(sin(t*pi) + 1)*(sin(x*pi) + sin(y*pi) +
+              (cos(y*pi)*sin(2*t*pi))/5 + 1))/5)^4)) - diffem*((32*ee*pi*cos(pi*x)^2*(sin(pi*x) + sin(pi*y) +
+              (cos(pi*y)*sin(2*pi*t))/5 + 1))/(massem*((12*diffmean_en*pi)/5 + (12*mumean_en*pi*(sin(t*pi) +
+              1)*(sin(x*pi) + sin(y*pi) + (cos(y*pi)*sin(2*t*pi))/5 + 1))/5)^2) - (16*ee*pi*sin(pi*x)*(sin(pi*x) +
+              sin(pi*y) + (cos(pi*y)*sin(2*pi*t))/5 + 1)^2)/(massem*((12*diffmean_en*pi)/5 + (12*mumean_en*pi*(sin(t*pi) +
+              1)*(sin(x*pi) + sin(y*pi) + (cos(y*pi)*sin(2*t*pi))/5 + 1))/5)^2) - (768*ee*mumean_en*pi^2*cos(pi*x)^2*(sin(pi*t) +
+              1)*(sin(pi*x) + sin(pi*y) + (cos(pi*y)*sin(2*pi*t))/5 + 1)^2)/(5*massem*((12*diffmean_en*pi)/5 +
+              (12*mumean_en*pi*(sin(t*pi) + 1)*(sin(x*pi) + sin(y*pi) + (cos(y*pi)*sin(2*t*pi))/5 + 1))/5)^3) +
+              (128*ee*mumean_en*pi^2*sin(pi*x)*(sin(pi*t) + 1)*(sin(pi*x) + sin(pi*y) + (cos(pi*y)*sin(2*pi*t))/5 +
+              1)^3)/(5*massem*((12*diffmean_en*pi)/5 + (12*mumean_en*pi*(sin(t*pi) + 1)*(sin(x*pi) + sin(y*pi) +
+              (cos(y*pi)*sin(2*t*pi))/5 + 1))/5)^3) + (4608*ee*mumean_en^2*pi^3*cos(pi*x)^2*(sin(pi*t) + 1)^2*(sin(pi*x) +
+              sin(pi*y) + (cos(pi*y)*sin(2*pi*t))/5 + 1)^3)/(25*massem*((12*diffmean_en*pi)/5 +
+              (12*mumean_en*pi*(sin(t*pi) + 1)*(sin(x*pi) + sin(y*pi) + (cos(y*pi)*sin(2*t*pi))/5 + 1))/5)^4)) -
+              (32*ee*((12*mumean_en*pi^2*cos(pi*t)*(sin(pi*x) + sin(pi*y) + (cos(pi*y)*sin(2*pi*t))/5 + 1))/5 +
+              (24*mumean_en*pi^2*cos(2*pi*t)*cos(pi*y)*(sin(pi*t) + 1))/25)*(sin(pi*x) + sin(pi*y) +
+              (cos(pi*y)*sin(2*pi*t))/5 + 1)^3)/(3*massem*pi*((12*diffmean_en*pi)/5 + (12*mumean_en*pi*(sin(t*pi) +
+              1)*(sin(x*pi) + sin(y*pi) + (cos(y*pi)*sin(2*t*pi))/5 + 1))/5)^3)) / N_A'
   [../]
   #The ion source term.
   [./ion_source]
@@ -346,7 +351,7 @@
     vars = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
     vals = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
     value = '(diffion*pi^2*sin(pi*x) + (diffion*pi^2*(5*sin(pi*y) + cos(pi*y)*sin(2*pi*t)))/5 +
-             (2*pi*cos(2*pi*t)*cos(pi*y))/5 + (muion*pi^2*(sin(pi*t) + 1)*(5*sin(pi*x) + 5*sin(pi*y) +
+             (2*pi*cos(2*pi*t)*cos(pi*y))/5 - (muion*pi^2*(sin(pi*t) + 1)*(5*sin(pi*x) + 5*sin(pi*y) +
              10*sin(pi*x)*sin(pi*y) - 10*cos(pi*x)^2 - 10*cos(pi*y)^2 + cos(pi*y)*sin(2*pi*t)*sin(pi*x) +
              2*cos(pi*y)*sin(2*pi*t)*sin(pi*y) + 10))/5) / N_A'
   [../]
@@ -365,21 +370,20 @@
     type = ParsedFunction
     vars = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
     vals = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
-    value = '-pi^2*cos(pi*t)*cos(pi*x) - diffpotential*pi^3*cos(pi*x)*(sin(pi*t) + 1)'
+    value = 'pi^2*cos(pi*t)*cos(pi*x) + diffpotential*pi^3*cos(pi*x)*(sin(pi*t) + 1)'
   [../]
   [./Ey_source]
     type = ParsedFunction
     vars = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
     vals = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
-    value = '-pi^2*cos(pi*t)*cos(pi*y) - diffpotential*pi^3*cos(pi*y)*(sin(pi*t) + 1)'
+    value = 'pi^2*cos(pi*t)*cos(pi*y) + diffpotential*pi^3*cos(pi*y)*(sin(pi*t) + 1)'
   [../]
 
   [./potential_source]
     type = ParsedFunction
     vars = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
     vals = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
-    value = '-pi*cos(pi*t)*(sin(pi*x) + sin(pi*y)) -
-             diffpotential*pi^2*sin(pi*x)*(sin(pi*t) + 1) -
+    value = '-pi*cos(pi*t)*(sin(pi*x) + sin(pi*y)) - diffpotential*pi^2*sin(pi*x)*(sin(pi*t) + 1) -
              diffpotential*pi^2*sin(pi*y)*(sin(pi*t) + 1)'
   [../]
 
@@ -389,7 +393,7 @@
     vars = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
     vals = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
     value = 'log(((16*ee*(sin(pi*y) + (cos(pi*y)*sin(2*pi*t))/5 + 1)^3)/(3*massem*pi*((12*diffmean_en*pi)/5 +
-                 (32*mumean_en*pi*(sin(t*pi) + 1)*(sin(y*pi) + (cos(y*pi)*sin(2*t*pi))/5 + 1))/5)^2)) / N_A)'
+                 (12*mumean_en*pi*(sin(t*pi) + 1)*(sin(y*pi) + (cos(y*pi)*sin(2*t*pi))/5 + 1))/5)^2)) / N_A)'
   [../]
   [./energy_left_BC]
     type = ParsedFunction
@@ -407,13 +411,13 @@
     type = ParsedFunction
     vars = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
     vals = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
-    value = '-pi*(sin(pi*t) + 1)'
+    value = 'pi*(sin(pi*t) + 1)'
   [../]
   [./Ey_left_BC]
     type = ParsedFunction
     vars = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
     vals = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
-    value = '-pi*cos(pi*y)*(sin(pi*t) + 1)'
+    value = 'pi*cos(pi*y)*(sin(pi*t) + 1)'
   [../]
   [./potential_left_BC]
     type = ParsedFunction
@@ -428,7 +432,7 @@
     vars = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
     vals = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
     value = 'log(((16*ee*(sin(pi*y) + (cos(pi*y)*sin(2*pi*t))/5 + 1)^3)/(3*massem*pi*((12*diffmean_en*pi)/5 +
-                 (32*mumean_en*pi*(sin(t*pi) + 1)*(sin(y*pi) + (cos(y*pi)*sin(2*t*pi))/5 + 1))/5)^2)) / N_A)'
+                 (12*mumean_en*pi*(sin(t*pi) + 1)*(sin(y*pi) + (cos(y*pi)*sin(2*t*pi))/5 + 1))/5)^2)) / N_A)'
   [../]
   [./energy_right_BC]
     type = ParsedFunction
@@ -446,13 +450,13 @@
     type = ParsedFunction
     vars = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
     vals = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
-    value = 'pi*(sin(pi*t) + 1)'
+    value = '-pi*(sin(pi*t) + 1)'
   [../]
   [./Ey_right_BC]
     type = ParsedFunction
     vars = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
     vals = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
-    value = '-pi*cos(pi*y)*(sin(pi*t) + 1)'
+    value = 'pi*cos(pi*y)*(sin(pi*t) + 1)'
   [../]
   [./potential_right_BC]
     type = ParsedFunction
@@ -467,7 +471,7 @@
     vars = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
     vals = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
     value = 'log(((16*ee*(sin(2*pi*t)/5 + sin(pi*x) + 1)^3)/(3*massem*pi*((12*diffmean_en*pi)/5 +
-                 (32*mumean_en*pi*(sin(t*pi) + 1)*(sin(2*t*pi)/5 + sin(x*pi) + 1))/5)^2)) / N_A)'
+                 (12*mumean_en*pi*(sin(t*pi) + 1)*(sin(2*t*pi)/5 + sin(x*pi) + 1))/5)^2)) / N_A)'
   [../]
   [./energy_down_BC]
     type = ParsedFunction
@@ -485,13 +489,13 @@
     type = ParsedFunction
     vars = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
     vals = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
-    value = '-pi*cos(pi*x)*(sin(pi*t) + 1)'
+    value = 'pi*cos(pi*x)*(sin(pi*t) + 1)'
   [../]
   [./Ey_down_BC]
     type = ParsedFunction
     vars = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
     vals = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
-    value = '-pi*(sin(pi*t) + 1)'
+    value = 'pi*(sin(pi*t) + 1)'
   [../]
   [./potential_down_BC]
     type = ParsedFunction
@@ -506,7 +510,7 @@
     vars = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
     vals = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
     value = 'log(((16*ee*(sin(pi*x) - sin(2*pi*t)/5 + 1)^3)/(3*massem*pi*((12*diffmean_en*pi)/5 +
-                 (32*mumean_en*pi*(sin(t*pi) + 1)*(sin(x*pi) - sin(2*t*pi)/5 + 1))/5)^2)) / N_A)'
+                 (12*mumean_en*pi*(sin(t*pi) + 1)*(sin(x*pi) - sin(2*t*pi)/5 + 1))/5)^2)) / N_A)'
   [../]
   [./energy_up_BC]
     type = ParsedFunction
@@ -524,13 +528,13 @@
     type = ParsedFunction
     vars = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
     vals = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
-    value = '-pi*cos(pi*x)*(sin(pi*t) + 1)'
+    value = 'pi*cos(pi*x)*(sin(pi*t) + 1)'
   [../]
   [./Ey_up_BC]
     type = ParsedFunction
     vars = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
     vals = 'ee N_A diffpotential diffem muem massem diffmean_en mumean_en diffion muion'
-    value = 'pi*(sin(pi*t) + 1)'
+    value = '-pi*(sin(pi*t) + 1)'
   [../]
   [./potential_up_BC]
     type = ParsedFunction
@@ -643,7 +647,7 @@
   [./energy_left_physical_diffusion]
     type = SakiyamaEnergyDiffusionBC
     variable = mean_en
-    em = em
+    electrons = em
     boundary = 3
     position_units = 1.0
   [../]
@@ -654,7 +658,6 @@
     ip = ion
     Ex = Ex
     Ey = Ey
-    potential = potential
     Tse_equal_Te = false
     user_se_energy = 1.0
     se_coeff = 1.0
@@ -680,7 +683,7 @@
   [./energy_down_physical_diffusion]
     type = SakiyamaEnergyDiffusionBC
     variable = mean_en
-    em = em
+    electrons = em
     boundary = 0
     position_units = 1.0
   [../]
@@ -691,7 +694,6 @@
     ip = ion
     Ex = Ex
     Ey = Ey
-    potential = potential
     Tse_equal_Te = false
     user_se_energy = 1.0
     se_coeff = 1.0
@@ -796,6 +798,10 @@
 []
 
 [Materials]
+  [field_solver]
+    type = FieldSolverMaterial
+    potential = potential
+  []
   [./Material_Coeff]
     type = GenericFunctionMaterial
     prop_names =  'e  N_A  massem diffpotential  diffEx         diffEy'

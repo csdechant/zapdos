@@ -66,7 +66,6 @@
   [./em_advection]
     type = EFieldAdvection
     variable = em
-    potential = 'potential'
     position_units = 1.0
   [../]
   [./em_source]
@@ -88,7 +87,6 @@
   [./ion_advection]
     type = EFieldAdvection
     variable = ion
-    potential = 'potential'
     position_units = 1.0
   [../]
   [./ion_source]
@@ -373,10 +371,9 @@
     type = LymberopoulosElectronBC
     variable = em
     boundary = 'left'
-    gamma = 1.0
+    emission_coeffs = 1.0
     ks = 1.0
-    ion = ion
-    potential = potential
+    ions = ion
     position_units = 1.0
   [../]
 
@@ -396,15 +393,18 @@
     type = LymberopoulosElectronBC
     variable = em
     boundary = 'right'
-    gamma = 1.0
+    emission_coeffs = 1.0
     ks = 1.0
-    ion = ion
-    potential = potential
+    ions = ion
     position_units = 1.0
   [../]
 []
 
 [Materials]
+  [field_solver]
+    type = FieldSolverMaterial
+    potential = potential
+  []
   [./Material_Coeff]
     type = GenericFunctionMaterial
     prop_names =  'e  N_A'
