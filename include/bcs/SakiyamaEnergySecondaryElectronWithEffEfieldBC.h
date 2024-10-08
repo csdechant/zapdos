@@ -12,6 +12,9 @@
 
 #include "ADIntegratedBC.h"
 
+/**
+ *  
+ */
 class SakiyamaEnergySecondaryElectronWithEffEfieldBC : public ADIntegratedBC
 {
 public:

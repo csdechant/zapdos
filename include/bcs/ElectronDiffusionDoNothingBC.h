@@ -12,8 +12,9 @@
 
 #include "ADIntegratedBC.h"
 
-// This diffusion kernel should only be used with species whose values are in the logarithmic form.
-
+/**
+ *  
+ */
 class ElectronDiffusionDoNothingBC : public ADIntegratedBC
 {
 public:

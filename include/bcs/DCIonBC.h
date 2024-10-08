@@ -12,6 +12,9 @@
 
 #include "ADIntegratedBC.h"
 
+/**
+ *  
+ */
 class DCIonBC : public ADIntegratedBC
 {
 public:

@@ -12,6 +12,9 @@
 
 #include "ADIntegratedBC.h"
 
+/**
+ *  
+ */
 class LymberopoulosElectronBC : public ADIntegratedBC
 {
 public:

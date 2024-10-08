@@ -12,6 +12,9 @@
 
 #include "ADIntegratedBC.h"
 
+/**
+ *  
+ */
 class FieldEmissionBC : public ADIntegratedBC
 {
 public:

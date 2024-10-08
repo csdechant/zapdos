@@ -15,9 +15,7 @@
 #include "ProvideMobility.h"
 
 /**
- * Boundary condition of a Dirichlet type
- *
- * Sets the value at the node to the value of a Postprocessor
+ *  
  */
 class PenaltyCircuitPotential : public NonlocalIntegratedBC
 {

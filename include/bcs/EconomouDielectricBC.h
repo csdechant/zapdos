@@ -12,6 +12,9 @@
 
 #include "ADIntegratedBC.h"
 
+/**
+ *  
+ */
 class EconomouDielectricBC : public ADIntegratedBC
 {
 public:

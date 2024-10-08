@@ -12,6 +12,9 @@
 
 #include "AuxKernel.h"
 
+/**
+ *  Linearly combine coupled variables with user provided weights and a bias
+ */
 class LinearCombinationAuxKernel : public AuxKernel
 {
 public:
@@ -22,9 +25,12 @@ public:
   virtual Real computeValue() override;
 
 protected:
+  /// Weighting term for each coupled variable
   const std::vector<Real> _weights;
+  /// Number of coupled variables
   const unsigned int _num_vars;
+  /// A bias term to shift the wieghted sum
   const Real _bias;
-  std::vector<const MooseVariable *> _vars;
+  /// Value of coupled variables
   std::vector<const VariableValue *> _var_vals;
 };

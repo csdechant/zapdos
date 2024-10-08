@@ -12,6 +12,9 @@
 
 #include "ADIntegratedBC.h"
 
+/**
+ *  
+ */
 class SakiyamaElectronDiffusionBC : public ADIntegratedBC
 {
 public:

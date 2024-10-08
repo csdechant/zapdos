@@ -12,6 +12,9 @@
 
 #include "ADIntegratedBC.h"
 
+/**
+ *  
+ */
 class HagelaarEnergyBC : public ADIntegratedBC
 {
 public:

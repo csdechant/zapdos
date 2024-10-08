@@ -13,7 +13,7 @@
 #include "ADNodalBC.h"
 
 /**
- * Implements a simple coupled boundary condition where u=v on the boundary.
+ *  
  */
 class ElectronTemperatureDirichletBC : public ADNodalBC
 {

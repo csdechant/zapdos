@@ -15,7 +15,7 @@
 #include "ProvideMobility.h"
 
 /**
- * Boundary condition of a Neumann style whose value is computed by a user-defined function
+ *  
  */
 class NeumannCircuitVoltageNew : public NonlocalIntegratedBC
 {

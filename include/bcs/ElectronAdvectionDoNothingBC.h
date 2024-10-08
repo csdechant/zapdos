@@ -12,6 +12,9 @@
 
 #include "ADIntegratedBC.h"
 
+/**
+ *  
+ */
 class ElectronAdvectionDoNothingBC : public ADIntegratedBC
 {
 public:

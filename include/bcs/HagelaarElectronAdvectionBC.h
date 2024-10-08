@@ -12,6 +12,9 @@
 
 #include "ADIntegratedBC.h"
 
+/**
+ *  
+ */
 class HagelaarElectronAdvectionBC : public ADIntegratedBC
 {
 public:

@@ -12,6 +12,9 @@
 
 #include "ADIntegratedBC.h"
 
+/**
+ *  
+ */
 class SecondaryElectronEnergyBC : public ADIntegratedBC
 {
 public:

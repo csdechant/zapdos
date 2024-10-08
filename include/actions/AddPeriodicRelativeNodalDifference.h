@@ -23,31 +23,50 @@ public:
   virtual void act();
 
 protected:
+  /// Helper function that 
   virtual void addPerviousSolutionsIC(const std::string & variable_name, const Real & initial);
+
+  /// Helper function that 
   virtual void addPerviousSolutionsKernels(const std::string & variable_name,
                                            const std::string & var_old_name);
+
+  /// Helper function that 
   virtual void addNormalizationKernels(const std::string & variable_name,
                                        const std::string & source,
                                        const std::string & averaged,
                                        const bool & log);
+
+  /// Helper function that 
   virtual void addAverageNodalPP(const std::string & variable_name, const bool & log);
+
+  /// Helper function that 
   virtual void addRelativePeriodicDiffPP(const std::string & variable_name,
                                          const std::string & var_old_name,
                                          const std::string & name);
+
+  /// Helper function that 
   virtual void AddTimePeriod(const std::vector<std::string> & objects,
                              const std::vector<Real> & start_times,
                              const std::vector<Real> & end_times,
                              const std::string & name_num,
                              const bool & first_controller);
 
+  ///
   Real _start_time;
+  ///
   Real _period;
+  ///
   Real _num_controller_set;
-
+  ///
   std::vector<std::string> _enable_start;
+  ///
   std::vector<std::string> _enable_end;
+  ///
   std::vector<Real> _enable_start_start_time_index;
+  ///
   std::vector<Real> _enable_start_end_time_index;
+  ///
   std::vector<Real> _enable_end_start_time_index;
+  ///
   std::vector<Real> _enable_end_end_time_index;
 };

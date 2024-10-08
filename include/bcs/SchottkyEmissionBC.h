@@ -12,6 +12,9 @@
 
 #include "ADIntegratedBC.h"
 
+/**
+ *  
+ */
 class SchottkyEmissionBC : public ADIntegratedBC
 {
 public:

@@ -13,9 +13,8 @@
 #include "ADNodalBC.h"
 
 /**
- * Boundary condition of a Dirichlet type
- *
- * Sets the value at the node to the value of a Postprocessor
+ *  Dirichlet circuit boundary condition for potential
+ *  (The current is given through an UserObject)
  */
 class CircuitDirichletPotential : public ADNodalBC
 {
@@ -27,8 +26,9 @@ public:
 protected:
   virtual ADReal computeQpResidual() override;
 
-  /// The value for this BC
+  /// Current provided as a postprocessor
   const PostprocessorValue & _current;
+  /// 
   const Function & _surface_potential;
   const std::string _surface;
   const Real _resist;

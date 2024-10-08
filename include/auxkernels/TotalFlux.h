@@ -12,6 +12,9 @@
 
 #include "AuxKernel.h"
 
+/**
+ *  Returns the total flux of the specified species
+ */
 template <bool is_ad>
 class TotalFluxTempl : public AuxKernel
 {
@@ -23,13 +26,21 @@ public:
   virtual Real computeValue() override;
 
 protected:
+  /// Component of the flux
   const int _component;
+  /// Coupled density variable
   const MooseVariable & _density_var;
+   /// Value of the coupled density variable
   const VariableValue & _density_log;
+  /// Gradient of the coupled density variable
   const VariableGradient & _grad_density_log;
+  /// Electric field provided as a material property
   const ADMaterialProperty<RealVectorValue> & _electric_field;
+  /// Mobility coefficient
   const GenericMaterialProperty<Real, is_ad> & _mu;
+  /// Charge sign of the coupled species
   const MaterialProperty<Real> & _sgn;
+  /// Diffusion coefficient
   const GenericMaterialProperty<Real, is_ad> & _diff;
 };
 

@@ -12,6 +12,9 @@
 
 #include "ADIntegratedBC.h"
 
+/**
+ *  
+ */
 class TM0AntennaVertBC : public ADIntegratedBC
 {
 public:
