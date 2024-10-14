@@ -13,7 +13,8 @@
 #include "ADIntegratedBC.h"
 
 /**
- *  
+ *  Boundary condition where the election advection flux at the boundary
+ *  is equal to the bulk election advection equation
  */
 class ElectronAdvectionDoNothingBC : public ADIntegratedBC
 {
@@ -25,11 +26,13 @@ public:
 protected:
   virtual ADReal computeQpResidual() override;
 
+  /// Scaling units for the position
   const Real _position_units;
 
-  // Material properties
-
+  /// Mobility coefficient of electrons
   const ADMaterialProperty<Real> & _muem;
+  /// Charge sign of electrons
   const MaterialProperty<Real> & _sign;
+  /// Electric field provided as a material property
   const ADMaterialProperty<RealVectorValue> & _electric_field;
 };

@@ -29,6 +29,6 @@ protected:
 
   /// Coupled electron density
   const VariableValue & _electron_density;
-  /// Coupled electron mean energy
+  /// Coupled electron mean energy density
   const VariableValue & _mean_en;
 };

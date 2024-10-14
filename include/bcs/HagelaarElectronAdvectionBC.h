@@ -13,7 +13,7 @@
 #include "ADIntegratedBC.h"
 
 /**
- *  
+ *  Kinetic advective electron boundary condition
  */
 class HagelaarElectronAdvectionBC : public ADIntegratedBC
 {
@@ -25,11 +25,14 @@ public:
 protected:
   virtual ADReal computeQpResidual() override;
 
+  /// Scaling units for the position
   const Real _r_units;
+  /// Reflection coefficient
   const Real _r;
-
+  /// Mobility coefficient of electrons
   const ADMaterialProperty<Real> & _muem;
+  /// Equal to 1 when the drift velocity is direct towards the wall and zero otherwise
   Real _a;
-
+  /// Electric field provided as a material property
   const ADMaterialProperty<RealVectorValue> & _electric_field;
 };
