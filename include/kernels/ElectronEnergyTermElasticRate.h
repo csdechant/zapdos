@@ -12,6 +12,9 @@
 
 #include "ADKernel.h"
 
+/**
+ *  
+ */
 class ElectronEnergyTermElasticRate : public ADKernel
 {
 public:

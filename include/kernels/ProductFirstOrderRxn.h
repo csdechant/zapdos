@@ -12,6 +12,9 @@
 
 #include "ADKernel.h"
 
+/**
+ *  
+ */
 class ProductFirstOrderRxn : public ADKernel
 {
 public:

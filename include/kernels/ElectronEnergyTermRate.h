@@ -12,6 +12,9 @@
 
 #include "ADKernel.h"
 
+/**
+ *  
+ */
 class ElectronEnergyTermRate : public ADKernel
 {
 public:

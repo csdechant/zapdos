@@ -12,6 +12,9 @@
 
 #include "ADKernel.h"
 
+/**
+ *  
+ */
 class ExcitationReaction : public ADKernel
 {
 public:

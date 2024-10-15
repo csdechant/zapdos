@@ -13,7 +13,7 @@
 #include "ADIntegratedBC.h"
 
 /**
- *  
+ *  Kinetic advective ion boundary condition
  */
 class HagelaarIonAdvectionBC : public ADIntegratedBC
 {
@@ -25,14 +25,18 @@ public:
 protected:
   virtual ADReal computeQpResidual() override;
 
+  /// Scaling units for the position
   const Real _r_units;
+  /// Reflection coefficient
   const Real & _r;
-
+  /// Electric field provided as a material property
   const ADMaterialProperty<RealVectorValue> & _electric_field;
-
+  /// Mobility coefficient of ions
   const ADMaterialProperty<Real> & _mu;
+  /// Elementary charge
   const MaterialProperty<Real> & _e;
+  /// Charge sign of the ions
   const MaterialProperty<Real> & _sgn;
-
+  /// Equal to 1 when the drift velocity is direct towards the wall and zero otherwise
   Real _a;
 };

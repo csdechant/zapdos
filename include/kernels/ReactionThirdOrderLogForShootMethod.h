@@ -12,6 +12,9 @@
 
 #include "ADKernel.h"
 
+/**
+ *  
+ */
 class ReactionThirdOrderLogForShootMethod : public ADKernel
 {
 public:

@@ -13,7 +13,7 @@
 #include "ADIntegratedBC.h"
 
 /**
- *  
+ *  The drift flux boundary conditions
  */
 class PotentialDriftOutflowBC : public ADIntegratedBC
 {
@@ -25,6 +25,8 @@ public:
 protected:
   virtual ADReal computeQpResidual() override;
 
+  /// Charge sign of the species
   const int _charge_sign;
+  /// Electric field provided as a material property
   const ADMaterialProperty<RealVectorValue> & _electric_field;
 };

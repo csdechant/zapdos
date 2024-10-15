@@ -12,6 +12,9 @@
 
 #include "ADKernel.h"
 
+/**
+ *  
+ */
 class JouleHeating : public ADKernel
 {
 public:

@@ -12,6 +12,9 @@
 
 #include "ADKernel.h"
 
+/**
+ *  
+ */
 class ProductAABBRxn : public ADKernel
 {
 public:

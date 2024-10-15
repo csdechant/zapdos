@@ -12,6 +12,9 @@
 
 #include "ADKernel.h"
 
+/**
+ *  
+ */
 class ReactantFirstOrderRxn : public ADKernel
 {
 public:

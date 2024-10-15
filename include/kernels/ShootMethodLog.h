@@ -12,6 +12,9 @@
 
 #include "ADKernel.h"
 
+/**
+ *  
+ */
 class ShootMethodLog : public ADKernel
 {
 public:

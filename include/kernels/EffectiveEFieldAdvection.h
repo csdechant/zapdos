@@ -12,6 +12,9 @@
 
 #include "ADKernel.h"
 
+/**
+ *  
+ */
 class EffectiveEFieldAdvection : public ADKernel
 {
 public:

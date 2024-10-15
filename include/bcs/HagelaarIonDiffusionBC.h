@@ -13,7 +13,7 @@
 #include "ADIntegratedBC.h"
 
 /**
- *  
+ *  Ion thermal diffusion boundary condition
  */
 class HagelaarIonDiffusionBC : public ADIntegratedBC
 {
@@ -25,13 +25,18 @@ public:
 protected:
   virtual ADReal computeQpResidual() override;
 
+  /// Scaling units for the position
   const Real _r_units;
+  /// Reflection coefficient
   const Real & _r;
-
+  /// Boltzmann constant
   const MaterialProperty<Real> & _kb;
+  /// Ion temperature
   const ADMaterialProperty<Real> & _T;
+  /// Mass of ions
   const MaterialProperty<Real> & _mass;
-
+  /// Ion thermal velocity
   ADReal _v_thermal;
+  /// Custom ion thermal velocity, if needed
   const Real & _user_velocity;
 };

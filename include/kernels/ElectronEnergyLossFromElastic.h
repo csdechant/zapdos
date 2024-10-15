@@ -12,6 +12,9 @@
 
 #include "ADKernel.h"
 
+/**
+ *  
+ */
 class ElectronEnergyLossFromElastic : public ADKernel
 {
 public:

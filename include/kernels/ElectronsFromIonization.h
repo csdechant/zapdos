@@ -12,6 +12,9 @@
 
 #include "ADKernel.h"
 
+/**
+ *  
+ */
 class ElectronsFromIonization : public ADKernel
 {
 public:

@@ -12,6 +12,9 @@
 
 #include "ADKernel.h"
 
+/**
+ *  
+ */
 class LogStabilizationMoles : public ADKernel
 {
 public:

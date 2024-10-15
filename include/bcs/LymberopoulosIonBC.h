@@ -13,7 +13,7 @@
 #include "ADIntegratedBC.h"
 
 /**
- *  
+ *  Simpified kinetic ion boundary condition
  */
 class LymberopoulosIonBC : public ADIntegratedBC
 {
@@ -25,9 +25,10 @@ public:
 protected:
   virtual ADReal computeQpResidual() override;
 
+  /// Scaling units for the position
   const Real _r_units;
-
+  /// Electric field provided as a material property
   const ADMaterialProperty<RealVectorValue> & _electric_field;
-
+  /// Mobility coefficient
   const ADMaterialProperty<Real> & _mu;
 };

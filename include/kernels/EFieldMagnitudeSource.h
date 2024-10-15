@@ -12,6 +12,9 @@
 
 #include "ADKernel.h"
 
+/**
+ *  
+ */
 class EFieldMagnitudeSource : public ADKernel
 {
 public:

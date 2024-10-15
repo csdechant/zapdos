@@ -16,7 +16,6 @@
  * This diffusion kernel should only be used with species whose values are in
  * the linear form.
  */
-
 class CoeffDiffusionLin : public ADKernel
 {
 public:

@@ -12,6 +12,9 @@
 
 #include "ADKernel.h"
 
+/**
+ *  
+ */
 class EffectiveEField : public ADKernel
 {
 public:

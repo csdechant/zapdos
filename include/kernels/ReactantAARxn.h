@@ -12,6 +12,9 @@
 
 #include "ADKernel.h"
 
+/**
+ *  
+ */
 class ReactantAARxn : public ADKernel
 {
 public:

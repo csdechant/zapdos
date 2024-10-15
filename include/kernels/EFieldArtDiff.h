@@ -12,6 +12,9 @@
 
 #include "ADKernel.h"
 
+/**
+ *  
+ */
 class EFieldArtDiff : public ADKernel
 {
 public:

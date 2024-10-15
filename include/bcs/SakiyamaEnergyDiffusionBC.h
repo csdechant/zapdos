@@ -13,7 +13,7 @@
 #include "ADIntegratedBC.h"
 
 /**
- *  
+ *  Kinetic advective electron energy boundary condition
  */
 class SakiyamaEnergyDiffusionBC : public ADIntegratedBC
 {
@@ -25,13 +25,14 @@ public:
 protected:
   virtual ADReal computeQpResidual() override;
 
+  /// Scaling units for the position
   const Real _r_units;
-
-  // Coupled variables
+  /// Electron density
   const ADVariableValue & _em;
-
+  /// Mass of electrons
   const MaterialProperty<Real> & _massem;
+  /// Elementary charge
   const MaterialProperty<Real> & _e;
-
+  /// Electron thermal velocity
   ADReal _v_thermal;
 };
