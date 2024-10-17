@@ -13,7 +13,8 @@
 #include "ADKernel.h"
 
 /**
- *  
+ *  Generic artificial electric field driven advection term 
+ *  (Densities must be in logarithmic form)
  */
 class EFieldArtDiff : public ADKernel
 {
@@ -25,10 +26,13 @@ public:
 protected:
   virtual ADReal computeQpResidual() override;
 
+  /// Scaling factor for the artificial diffusion
   const Real & _scale;
+  /// Position units
   const Real _r_units;
 
-  /// Material Properties
+  /// Mobility coefficient
   const ADMaterialProperty<Real> & _mu;
+  /// Electric field provided as a material property
   const ADMaterialProperty<RealVectorValue> & _electric_field;
 };

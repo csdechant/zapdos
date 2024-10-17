@@ -16,9 +16,7 @@ InputParameters
 PlasmaDielectricConstantCoeffField::validParams()
 {
   InputParameters params = ADVectorKernel::validParams();
-  params.addClassDescription(
-      "PlasmaDielectricConstantSecondTimeDerivative implementation for time harmonic electric "
-      "field. Only for time-harmonic field solves when the plasma is transient!");
+  params.addClassDescription("");
   MooseEnum component("real imaginary", "real");
   params.addParam<MooseEnum>(
       "component",

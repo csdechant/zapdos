@@ -30,6 +30,6 @@ private:
   /// Position units
   const Real _r_units;
 
-  /// The diffusion coefficient (either constant or mixture-averaged)
+  /// The diffusion coefficient
   const ADMaterialProperty<Real> & _diffusivity;
 };

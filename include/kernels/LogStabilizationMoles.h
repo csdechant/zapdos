@@ -13,7 +13,8 @@
 #include "ADKernel.h"
 
 /**
- *  
+ *  Kernel stabilizes solution variable u in places where u → 0; b is the offset value
+ *  specified by the user. A typical value for b is 20.
  */
 class LogStabilizationMoles : public ADKernel
 {
@@ -25,5 +26,6 @@ public:
 protected:
   virtual ADReal computeQpResidual() override;
 
+  // Offset parameter that goes into the exponential function
   const Real & _offset;
 };

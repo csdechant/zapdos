@@ -3,7 +3,8 @@
 #include "ADTimeKernel.h"
 
 /**
- *
+ *  PlasmaDielectricConstantSecondTimeDerivative implementation for time harmonic electric
+ *  field. Only for time-harmonic field solves when the plasma is transient!
  */
 class PlasmaDielectricConstantSecondTimeDerivative : public ADVectorTimeKernel
 {

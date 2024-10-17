@@ -15,6 +15,9 @@
 
 #include "ADMaterial.h"
 
+/**
+ *  
+ */
 class ADMMSEEDFRates : public ADMaterial
 {
 public:
@@ -25,17 +28,26 @@ protected:
   virtual void initQpStatefulProperties() override;
   virtual void computeQpProperties() override;
 
+  /// Electron density
   const ADVariableValue & _em;
+  /// Electron mean energy density
   const ADVariableValue & _mean_en;
 
+  /// Name of material properties
   std::vector<std::string> _prop_names;
+  /// Name of functions representing property values
   std::vector<FunctionName> _prop_values;
+  /// Name of functions representing derivative of the property values wrt the electron mean energy
   std::vector<FunctionName> _d_prop_values_actual_mean_en;
 
+  /// Number of named material properties
   unsigned int _num_props;
 
+  /// Material properties
   std::vector<ADMaterialProperty<Real> *> _properties;
+  /// Functions of material properties
   std::vector<const Function *> _functions;
+  /// Functions of derivatives of material properties
   std::vector<const Function *> _deriv_functions;
 
   using ADMaterial::_communicator;

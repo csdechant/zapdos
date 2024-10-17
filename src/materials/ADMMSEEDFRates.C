@@ -34,6 +34,7 @@ ADMMSEEDFRates::validParams()
                                              "actual mean energy for the variables");
   params.addCoupledVar("mean_energy", "The electron mean energy in log form.");
   params.addCoupledVar("electrons", "The electron density.");
+  params.addClassDescription("Add material properties used for MMS verifications involving properties as a function of electron mean energy.");
   return params;
 }
 

@@ -13,7 +13,7 @@
 #include "ADKernel.h"
 
 /**
- *  
+ *  Generic electric field driven advection term. (Densities must be in logarithmic form)
  */
 class EFieldAdvection : public ADKernel
 {
@@ -29,8 +29,10 @@ private:
   /// Position units
   const Real _r_units;
 
-  /// The diffusion coefficient (either constant or mixture-averaged)
+  /// Mobility coefficient
   const ADMaterialProperty<Real> & _mu;
+  /// Charge sign of the species
   const MaterialProperty<Real> & _sign;
+  /// Electric field provided as a material property
   const ADMaterialProperty<RealVectorValue> & _electric_field;
 };

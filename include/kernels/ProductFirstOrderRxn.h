@@ -13,7 +13,8 @@
 #include "ADKernel.h"
 
 /**
- *  
+ *  Generic first order reaction source term for u (v is the reactant
+ *  and densities must be in logarithmic form)
  */
 class ProductFirstOrderRxn : public ADKernel
 {
@@ -25,9 +26,11 @@ public:
 protected:
   virtual ADReal computeQpResidual() override;
 
+  /// Coupled species density variable
   MooseVariable & _coupled_var;
+  /// Coupled species density value
   const ADVariableValue & _v;
 
-  /// The reaction coefficient
+  /// Reaction coefficient
   const ADMaterialProperty<Real> & _reaction_coeff;
 };

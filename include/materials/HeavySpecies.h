@@ -14,6 +14,9 @@
 /* #include "LinearInterpolation.h" */
 #include "SplineInterpolation.h"
 
+/**
+ *  
+ */
 template <bool is_ad>
 class HeavySpeciesTempl : public Material
 {

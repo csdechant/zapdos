@@ -13,7 +13,7 @@
 #include "ADKernel.h"
 
 /**
- *  
+ *  Joule heating term for electrons (densities must be in logarithmic form)
  */
 class JouleHeating : public ADKernel
 {
@@ -26,16 +26,23 @@ protected:
   virtual ADReal computeQpResidual() override;
 
 private:
+
   /// Position units
   const Real _r_units;
+  /// Scaling units for the potential (V or kV)
   const std::string & _potential_units;
 
-  /// The diffusion coefficient (either constant or mixture-averaged)
+  /// Diffusion coefficient
   const ADMaterialProperty<Real> & _diff;
+  /// Mobility coefficient
   const ADMaterialProperty<Real> & _mu;
+  /// Electric field provided as a material property
   const ADMaterialProperty<RealVectorValue> & _electric_field;
+  /// Electron density
   const ADVariableValue & _em;
+  /// Gradient of electron density
   const ADVariableGradient & _grad_em;
 
+  /// Scaling value for the potential
   Real _voltage_scaling;
 };

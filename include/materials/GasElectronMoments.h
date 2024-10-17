@@ -13,6 +13,9 @@
 #include "ADMaterial.h"
 #include "SplineInterpolation.h"
 
+/**
+ *  
+ */
 class GasElectronMoments : public ADMaterial
 {
 public:

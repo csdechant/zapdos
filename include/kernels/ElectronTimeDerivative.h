@@ -13,7 +13,7 @@
 #include "ADTimeKernel.h"
 
 /**
- *  
+ *  Generic accumulation term for variables in logarithmic form
  */
 class ElectronTimeDerivative : public ADTimeKernel
 {
@@ -25,5 +25,6 @@ public:
 protected:
   virtual ADReal computeQpResidual() override;
 
+  /// True for mass matrix lumping
   const bool & _lumping;
 };

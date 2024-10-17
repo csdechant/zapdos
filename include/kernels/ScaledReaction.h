@@ -13,7 +13,8 @@
 #include "ADKernel.h"
 
 /**
- *  
+ *  The multiple of a given variable
+ *  (Used for calculating the effective ion potential for a given collision frequency)
  */
 class ScaledReaction : public ADKernel
 {
@@ -25,5 +26,6 @@ public:
 protected:
   virtual ADReal computeQpResidual() override;
 
+  /// Momentum-transfer frequency of ions
   const Real & _nu;
 };

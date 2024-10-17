@@ -13,7 +13,7 @@
 #include "ADKernel.h"
 
 /**
- *  
+ *  TODO: That kernel maybe obsolete with the EM module coupling
  */
 class EffectiveEFieldAdvection : public ADKernel
 {

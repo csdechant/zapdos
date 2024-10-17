@@ -13,7 +13,7 @@
 #include "ADKernel.h"
 
 /**
- *  
+ *  Electric field magnitude source term
  */
 class EFieldMagnitudeSource : public ADKernel
 {
@@ -25,5 +25,6 @@ public:
 protected:
   virtual ADReal computeQpResidual() override;
 
+  /// Electric field provided as a material property
   const ADMaterialProperty<RealVectorValue> & _electric_field;
 };

@@ -14,6 +14,9 @@
 #include "LinearInterpolation.h"
 #include "SplineInterpolation.h"
 
+/**
+ *  
+ */
 class Gas : public ADMaterial
 {
 public:

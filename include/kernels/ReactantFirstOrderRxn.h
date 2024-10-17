@@ -13,7 +13,8 @@
 #include "ADKernel.h"
 
 /**
- *  
+ *  Generic first order reaction sink term for u (u is the reactant)
+ *  (Densities must be in logarithmic form)
  */
 class ReactantFirstOrderRxn : public ADKernel
 {
@@ -25,6 +26,6 @@ public:
 protected:
   virtual ADReal computeQpResidual() override;
 
-  /// The reaction coefficient
+  /// Reaction coefficient
   const ADMaterialProperty<Real> & _reaction_coeff;
 };
