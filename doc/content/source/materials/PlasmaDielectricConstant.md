@@ -21,7 +21,7 @@ where
 - $\omega$ is the drive frequency of the wave propagation,
 - $\nu_{m}$ is the electron-neutral collision frequency,
 - $e$ is the elementary charge,
-- $n_{e}$ is the electron density, and 
+- $n_{e}$ is the electron density, and
 - $m_{e}$ is the electron mass.
 
 ## Example Input File Syntax

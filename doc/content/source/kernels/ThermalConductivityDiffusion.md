@@ -22,7 +22,7 @@ where
 - $\vec{\Gamma}_{e}$ is the electron flux,
 - $n_{e}$ is the electron density,
 - $D_{e}$ is the electron diffusion coefficient,
-- $\mu_{e}$ is the electron mobility coefficient, and 
+- $\mu_{e}$ is the electron mobility coefficient, and
 - $\vec{E}$ is the electric field.
 
 Instead of the electron temperature, Zapdos solves for the electron energy density ($n_{\varepsilon}$), such that:
