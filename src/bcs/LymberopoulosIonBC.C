@@ -31,13 +31,14 @@ LymberopoulosIonBC::LymberopoulosIonBC(const InputParameters & parameters)
     // Coupled Variables
     _grad_potential(adCoupledGradient("potential")),
 
-    _mu(getADMaterialProperty<Real>("mu" + _var.name()))
+    _mu(getADMaterialProperty<Real>("mu" + _var.name())),
+    _sgn(getMaterialProperty<Real>("sgn" + _var.name()))
 {
 }
 
 ADReal
 LymberopoulosIonBC::computeQpResidual()
 {
-  return _test[_i][_qp] * _r_units * _mu[_qp] * -_grad_potential[_qp] * _r_units *
+  return _test[_i][_qp] * _r_units * _sgn[_qp] * _mu[_qp] * -_grad_potential[_qp] * _r_units *
          std::exp(_u[_qp]) * _normals[_qp];
 }

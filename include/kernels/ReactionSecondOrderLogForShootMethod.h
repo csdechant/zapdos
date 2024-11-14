@@ -22,7 +22,7 @@ public:
 protected:
   virtual ADReal computeQpResidual() override;
 
-  const ADMaterialProperty<Real> & _reaction_coeff;
+  const MaterialProperty<Real> & _reaction_coeff;
 
   const ADVariableValue & _density;
   unsigned int _density_id;

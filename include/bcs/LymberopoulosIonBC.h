@@ -28,4 +28,5 @@ protected:
   const ADVariableGradient & _grad_potential;
 
   const ADMaterialProperty<Real> & _mu;
+  const MaterialProperty<Real> & _sgn;
 };
