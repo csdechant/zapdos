@@ -23,7 +23,8 @@ protected:
   virtual ADReal computeQpResidual() override;
 
   /// Coupled variable
-  MooseVariable & _charged_var;
+  // MooseVariable & _charged_var;
+  const MooseVariableFieldBase & _charged_var;
   const ADVariableValue & _charged;
 
   /// Material properties (regular because these are constants)

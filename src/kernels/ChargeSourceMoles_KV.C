@@ -26,7 +26,8 @@ ChargeSourceMoles_KV::validParams()
 
 ChargeSourceMoles_KV::ChargeSourceMoles_KV(const InputParameters & parameters)
   : ADKernel(parameters),
-    _charged_var(*getVar("charged", 0)),
+    // _charged_var(*getVar("charged", 0)),
+    _charged_var(*getFieldVar("charged", 0)),
     _charged(adCoupledValue("charged")),
     _e(getMaterialProperty<Real>("e")),
     _sgn(getMaterialProperty<Real>("sgn" + _charged_var.name())),
