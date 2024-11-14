@@ -42,8 +42,8 @@ DependentCollisionFreq::DependentCollisionFreq(const InputParameters & parameter
     _k_boltz(getMaterialProperty<Real>("k_boltz")),
     _T_gas(getMaterialProperty<Real>("T_gas")),
     _p_gas(getMaterialProperty<Real>("p_gas")),
-    _pi(libMesh::pi),
     _frequency(getParam<Real>("driving_frequency")),
+    _pi(libMesh::pi),
     _delta(getParam<Real>("delta"))
 {
   std::vector<Real> val_x;
