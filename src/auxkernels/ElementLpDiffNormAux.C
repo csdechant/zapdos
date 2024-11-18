@@ -19,7 +19,7 @@ ElementLpDiffNormAux::validParams()
 {
   InputParameters params = AuxKernel::validParams();
   params.addClassDescription("Compute an elemental field variable (single value per element) equal "
-                             "to the Lp-norm of the differecne of two coupled Variables.");
+                             "to the Lp-norm of the differenece of two coupled Variables.");
   params.addRangeCheckedParam<Real>("p", 2.0, "p>=1", "The exponent used in the norm.");
   params.addRequiredCoupledVar("v", "The first variable to compute the diff of.");
   params.addRequiredCoupledVar("w", "The second variable to compute the diff of.");
