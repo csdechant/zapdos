@@ -1,8 +1,7 @@
 #pragma once
 
 #include "ADMaterial.h"
-// #include "SplineInterpolation.h"
-#include "LinearInterpolation.h"
+#include "SplineInterpolation.h"
 
 /**
  *
@@ -17,15 +16,18 @@ public:
 protected:
   virtual void computeQpProperties() override;
 
-  std::unique_ptr<LinearInterpolation> _nu_interpolation;
+  SplineInterpolation _nu_interpolation;
 
-  bool _use_energy;
   ADMaterialProperty<Real> & _nu_neutral;
   ADMaterialProperty<RealVectorValue> & _grad_nu_neutral;
+
+  const MooseEnum _interp;
+
   const ADVariableValue & _em;
   const ADVariableValue & _mean_en;
   const ADVariableGradient & _grad_em;
   const ADVariableGradient & _grad_mean_en;
+
   const ADMaterialProperty<RealVectorValue> & _electric_field;
 
   const MaterialProperty<Real> & _k_boltz;

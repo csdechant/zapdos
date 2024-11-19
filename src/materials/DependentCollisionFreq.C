@@ -1,5 +1,6 @@
 #include "DependentCollisionFreq.h"
 #include "MooseUtils.h"
+#include "PlasmaEnums.h"
 
 #include "MooseVariable.h"
 
@@ -11,8 +12,8 @@ DependentCollisionFreq ::validParams()
   InputParameters params = ADMaterial::validParams();
   params.addClassDescription("");
 
-  params.addCoupledVar("mean_energy", "The electron mean energy in log form.");
-  params.addCoupledVar("electrons", "The electron density.");
+  params.addCoupledVar("mean_energy", "The electron mean energy density in logarithmic form.");
+  params.addCoupledVar("electrons", "The electron density in logarithmic form.");
   params.addParam<Real>("driving_frequency", 0.0, "Driving frequency of plasma (in Hz).");
   params.addParam<Real>("delta", 20.0, "The Doppler broadening parameter");
   params.addRequiredParam<std::string>(
@@ -22,23 +23,29 @@ DependentCollisionFreq ::validParams()
   params.addParam<std::string>("field_property_name",
                                "field_solver_interface_property",
                                "Name of the solver interface material property.");
-  params.addParam<bool>("use_mean_energy", true, "whether to mean energy or reduce Efield");
+  MooseEnum interpolation("mean_energy reduce_Efield", "mean_energy");
+  params.addParam<MooseEnum>("interpolation_type",
+                             interpolation,
+                             "Whether to use mean energy or reduce Efield to interpolate collision "
+                             "frequency (default = mean_energy).");
+  params.addClassDescription(
+      "Material property for electron momentum-transfer collision frequency");
   return params;
 }
 
 DependentCollisionFreq::DependentCollisionFreq(const InputParameters & parameters)
   : ADMaterial(parameters),
-
-    _use_energy(getParam<bool>("use_mean_energy")),
     _nu_neutral(declareADProperty<Real>("nu_neutral")),
     _grad_nu_neutral(declareADProperty<RealVectorValue>("grad_nu_neutral")),
-    _em(adCoupledValue("electrons")),
-    _mean_en(adCoupledValue("mean_energy")),
-    _grad_em(adCoupledGradient("electrons")),
-    _grad_mean_en(adCoupledGradient("mean_energy")),
+    _interp(getParam<MooseEnum>("interpolation_type")),
+    _em((_interp == LTP::MEAN_ENERGY) ? adCoupledValue("electrons") : _ad_zero),
+    _mean_en((_interp == LTP::MEAN_ENERGY) ? adCoupledValue("mean_energy") : _ad_zero),
+    _grad_em((_interp == LTP::MEAN_ENERGY) ? adCoupledGradient("electrons") : _ad_grad_zero),
+    _grad_mean_en((_interp == LTP::MEAN_ENERGY) ? adCoupledGradient("mean_energy") : _ad_grad_zero),
     _electric_field(
-        getADMaterialProperty<RealVectorValue>(getParam<std::string>("field_property_name"))),
-
+        (_interp == LTP::REDUDE_EFIELD)
+            ? getADMaterialProperty<RealVectorValue>(getParam<std::string>("field_property_name"))
+            : getGenericZeroMaterialProperty<RealVectorValue, true>()),
     _k_boltz(getMaterialProperty<Real>("k_boltz")),
     _T_gas(getMaterialProperty<Real>("T_gas")),
     _p_gas(getMaterialProperty<Real>("p_gas")),
@@ -68,7 +75,7 @@ DependentCollisionFreq::DependentCollisionFreq(const InputParameters & parameter
   else
     mooseError("Unable to open file");
 
-  _nu_interpolation = std::make_unique<LinearInterpolation>(val_x, nu, true);
+  _nu_interpolation.setData(val_x, nu);
 }
 
 void
@@ -76,22 +83,19 @@ DependentCollisionFreq::computeQpProperties()
 {
   Real _N_gas = _p_gas[_qp] / (_k_boltz[_qp] * _T_gas[_qp]);
 
-  if (_use_energy)
+  if (_interp == LTP::MEAN_ENERGY)
   {
-    //_nu_neutral[_qp].value() =
-    //    _nu_interpolation->sample(std::exp(_mean_en[_qp].value() - _em[_qp].value())) * _N_gas +
-    //    (15.39e9 / 20);
     _nu_neutral[_qp].value() =
-        _nu_interpolation->sample(std::exp(_mean_en[_qp].value() - _em[_qp].value())) * _N_gas +
+        _nu_interpolation.sample(std::exp(_mean_en[_qp].value() - _em[_qp].value())) * _N_gas +
         (2 * _pi * _frequency) / _delta;
-    ;
+
     _nu_neutral[_qp].derivatives() =
-        _nu_interpolation->sampleDerivative(std::exp(_mean_en[_qp].value() - _em[_qp].value())) *
+        _nu_interpolation.sampleDerivative(std::exp(_mean_en[_qp].value() - _em[_qp].value())) *
         _N_gas * std::exp(_mean_en[_qp].value() - _em[_qp].value()) *
         (_mean_en[_qp].derivatives() - _em[_qp].derivatives());
 
     _grad_nu_neutral[_qp] =
-        _nu_interpolation->sampleDerivative(std::exp(_mean_en[_qp].value() - _em[_qp].value())) *
+        _nu_interpolation.sampleDerivative(std::exp(_mean_en[_qp].value() - _em[_qp].value())) *
         _N_gas * std::exp(_mean_en[_qp] - _em[_qp]) * (_grad_mean_en[_qp] - _grad_em[_qp]);
 
     // Safeguard agains zero values resulting from extrapolation
@@ -108,13 +112,13 @@ DependentCollisionFreq::computeQpProperties()
     Real Td = _N_gas * 1e-21;
 
     _nu_neutral[_qp] =
-        _nu_interpolation->sample(std::sqrt(std::pow(_electric_field[_qp](0).value(), 2) +
+        _nu_interpolation.sample(std::sqrt(std::pow(_electric_field[_qp](0).value(), 2) +
                                             std::pow(_electric_field[_qp](1).value(), 2) +
                                             std::pow(_electric_field[_qp](2).value(), 2)) /
                                   Td) *
         _N_gas;
 
-    _grad_nu_neutral[_qp] = _nu_interpolation->sampleDerivative(
+    _grad_nu_neutral[_qp] = _nu_interpolation.sampleDerivative(
                                 std::sqrt(std::pow(_electric_field[_qp](0).value(), 2) +
                                           std::pow(_electric_field[_qp](1).value(), 2) +
                                           std::pow(_electric_field[_qp](2).value(), 2)) /
