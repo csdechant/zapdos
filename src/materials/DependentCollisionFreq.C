@@ -113,16 +113,16 @@ DependentCollisionFreq::computeQpProperties()
 
     _nu_neutral[_qp] =
         _nu_interpolation.sample(std::sqrt(std::pow(_electric_field[_qp](0).value(), 2) +
-                                            std::pow(_electric_field[_qp](1).value(), 2) +
-                                            std::pow(_electric_field[_qp](2).value(), 2)) /
-                                  Td) *
+                                           std::pow(_electric_field[_qp](1).value(), 2) +
+                                           std::pow(_electric_field[_qp](2).value(), 2)) /
+                                 Td) *
         _N_gas;
 
-    _grad_nu_neutral[_qp] = _nu_interpolation.sampleDerivative(
-                                std::sqrt(std::pow(_electric_field[_qp](0).value(), 2) +
-                                          std::pow(_electric_field[_qp](1).value(), 2) +
-                                          std::pow(_electric_field[_qp](2).value(), 2)) /
-                                Td) *
-                            _N_gas;
+    _grad_nu_neutral[_qp] =
+        _nu_interpolation.sampleDerivative(std::sqrt(std::pow(_electric_field[_qp](0).value(), 2) +
+                                                     std::pow(_electric_field[_qp](1).value(), 2) +
+                                                     std::pow(_electric_field[_qp](2).value(), 2)) /
+                                           Td) *
+        _N_gas;
   }
 }

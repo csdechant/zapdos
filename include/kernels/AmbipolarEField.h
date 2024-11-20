@@ -1,8 +1,9 @@
-//* This file is part of the MOOSE framework
-//* https://www.mooseframework.org
+//* This file is part of Zapdos, an open-source
+//* application for the simulation of plasmas
+//* https://github.com/shannon-lab/zapdos
 //*
-//* All rights reserved, see COPYRIGHT for full restrictions
-//* https://github.com/idaholab/moose/blob/master/COPYRIGHT
+//* Zapdos is powered by the MOOSE Framework
+//* https://www.mooseframework.org
 //*
 //* Licensed under LGPL 2.1, please see LICENSE for details
 //* https://www.gnu.org/licenses/lgpl-2.1.html
@@ -13,8 +14,7 @@
 #include "Function.h"
 
 /**
- *  Kernel representing the contribution of the PDE term $fu$, where $f$ is a function
- *  coefficient and $u$ is a vector variable.
+ *  Calculates the ambipolar electric field based on electron and ion transport coefficients
  */
 class AmbipolarEField : public ADVectorKernel
 {
@@ -27,15 +27,16 @@ protected:
   virtual ADReal computeQpResidual() override;
 
 private:
-  // MooseEnum signifying sign of weak form contribution
-  // const MooseEnum _sign;
-
+  /// Electron density
   const ADVariableValue & _em;
+  /// Gradient of electron density
   const ADVariableGradient & _grad_em;
-
+  /// Electron diffusion coefficient
   const ADMaterialProperty<Real> & _diffem;
+  /// Electron mobility coefficient
   const ADMaterialProperty<Real> & _muem;
-
+  /// Ion diffusion coefficient
   const ADMaterialProperty<Real> & _diffion;
+  /// Ion mobility coefficient
   const ADMaterialProperty<Real> & _muion;
 };

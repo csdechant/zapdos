@@ -9,13 +9,14 @@
 
 #include "AmbipolarEField.h"
 
-registerMooseObject("ElectromagneticsApp", AmbipolarEField);
+registerMooseObject("ZapdosApp", AmbipolarEField);
 
 InputParameters
 AmbipolarEField::validParams()
 {
   InputParameters params = ADVectorKernel::validParams();
-  params.addClassDescription("");
+  params.addClassDescription(
+      "Calculates the ambipolar electric field based on electron and ion transport coefficients.");
   params.addRequiredCoupledVar("em", "The electron density");
   params.addRequiredParam<MaterialPropertyName>("ion_diffusion",
                                                 "The diffusion coeff. of the ions.");
