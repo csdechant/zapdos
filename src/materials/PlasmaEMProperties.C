@@ -1,9 +1,11 @@
-#include "PlasmaDielectricConstant.h"
 
-registerMooseObject("ZapdosApp", PlasmaDielectricConstant);
+#include "PlasmaEMProperties.h"
+#include "PlasmaEnums.h"
+
+registerMooseObject("ZapdosApp", PlasmaEMProperties);
 
 InputParameters
-PlasmaDielectricConstant::validParams()
+PlasmaEMProperties::validParams()
 {
   InputParameters params = ADMaterial::validParams();
   params.addRequiredParam<MaterialPropertyName>(
@@ -12,13 +14,26 @@ PlasmaDielectricConstant::validParams()
       "electron_neutral_collision_frequency_gradient",
       "The gradient electron-neutral collision frequency (in Hz).");
   params.addRequiredParam<Real>("driving_frequency", "Driving frequency of plasma (in Hz).");
+<<<<<<< HEAD:src/materials/PlasmaDielectricConstant.C
   params.addCoupledVar("electrons", "The electron density in log form");
   params.addClassDescription("Provides the real and complex components, the spatial gradient and "
                              "the first time derivative of the plasma dielectric.");
+=======
+  params.addRequiredCoupledVar("em", "Electron density coupled variable.");
+  params.addClassDescription(
+      "Provides the real and complex components, the spatial gradient, the first time derivative, "
+      "and second time derivative of the plasma dielectric and the real and complex components of "
+      "the plasma conductivity.");
+  MooseEnum coeff("relative absolute", "relative");
+  params.addParam<MooseEnum>(
+      "coeff_type",
+      coeff,
+      "Whether to use relative or absolute versions of the electromagnetic properties.");
+>>>>>>> 6a7b3540 (Consolidating of version of PlasmaDielectricConstant and renaming to PlasmaEMProperties):src/materials/PlasmaEMProperties.C
   return params;
 }
 
-PlasmaDielectricConstant::PlasmaDielectricConstant(const InputParameters & parameters)
+PlasmaEMProperties::PlasmaEMProperties(const InputParameters & parameters)
   : ADMaterial(parameters),
     _eps_r_real(declareADProperty<Real>("plasma_dielectric_constant_real")),
     _eps_r_real_grad(declareADProperty<RealVectorValue>("plasma_dielectric_constant_real_grad")),
@@ -32,28 +47,25 @@ PlasmaDielectricConstant::PlasmaDielectricConstant(const InputParameters & param
     _electron_mass(9.1095e-31),
     _eps_vacuum(8.8542e-12),
     _pi(libMesh::pi),
-
     _nu(getADMaterialProperty<Real>("electron_neutral_collision_frequency")),
     _grad_nu(
         getADMaterialProperty<RealVectorValue>("electron_neutral_collision_frequency_gradient")),
-
     _frequency(getParam<Real>("driving_frequency")),
     _em(adCoupledValue("electrons")),
     _em_grad(adCoupledGradient("electrons")),
     _em_var(getVar("electrons", 0)),
     _em_dot(_fe_problem.isTransient() ? _em_var->adUDot() : _ad_zero),
     _em_dot_dot(_fe_problem.isTransient() ? _em_var->adUDotDot() : _ad_zero),
-
     _N_A(getMaterialProperty<Real>("N_A")),
-    _eps(getMaterialProperty<Real>("eps")),
     _sigma_pe_real(declareADProperty<Real>("plasma_conductivity_real")),
-    _sigma_pe_imag(declareADProperty<Real>("plasma_conductivity_imag"))
+    _sigma_pe_imag(declareADProperty<Real>("plasma_conductivity_imag")),
+    _coeff_type(getParam<MooseEnum>("coeff_type"))
 
 {
 }
 
 void
-PlasmaDielectricConstant::computeQpProperties()
+PlasmaEMProperties::computeQpProperties()
 {
   using std::exp;
   using std::pow;

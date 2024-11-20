@@ -1,26 +1,30 @@
+//* This file is part of Zapdos, an open-source
+//* application for the simulation of plasmas
+//* https://github.com/shannon-lab/zapdos
+//*
+//* Zapdos is powered by the MOOSE Framework
+//* https://www.mooseframework.org
+//*
+//* Licensed under LGPL 2.1, please see LICENSE for details
+//* https://www.gnu.org/licenses/lgpl-2.1.html
+
 #pragma once
 
 #include "ADMaterial.h"
-// #include "SplineInterpolation.h"
-#include "LinearInterpolation.h"
 
 /**
- *
+ *  Provides the real and complex components, the spatial gradient and
+ *  the first time derivative of the plasma dielectric.
  */
-class ReduceEFieldDependentPlasmaDielectricConstant : public ADMaterial
+class PlasmaEMProperties : public ADMaterial
 {
 public:
   static InputParameters validParams();
 
-  ReduceEFieldDependentPlasmaDielectricConstant(const InputParameters & parameters);
+  PlasmaEMProperties(const InputParameters & parameters);
 
 protected:
   virtual void computeQpProperties() override;
-
-  std::unique_ptr<LinearInterpolation> _nu_interpolation;
-  std::unique_ptr<LinearInterpolation> _temp_interpolation;
-
-  ADMaterialProperty<Real> & _sigma_pe_real;
 
   /// Value of dielectric constant, real component
   ADMaterialProperty<Real> & _eps_r_real;
@@ -49,7 +53,8 @@ protected:
   const Real _pi;
 
   /// Electron-neutral collision frequency (Hz)
-  const Real & _user_nu;
+  const ADMaterialProperty<Real> & _nu;
+  const ADMaterialProperty<RealVectorValue> & _grad_nu;
 
   /// Operating frequency (Hz)
   const Real & _frequency;
@@ -61,7 +66,7 @@ protected:
   const ADVariableGradient & _em_grad;
 
   /// Electron density variable
-  MooseVariable * _em_var;
+  const MooseVariable * _em_var;
 
   /// Electron density first time derivative
   const ADVariableValue & _em_dot;
@@ -69,11 +74,8 @@ protected:
   /// Electron density second time derivative
   const ADVariableValue & _em_dot_dot;
 
-  const ADMaterialProperty<RealVectorValue> & _electric_field;
-
-  const MaterialProperty<Real> & _k_boltz;
-  const MaterialProperty<Real> & _T_gas;
-  const MaterialProperty<Real> & _p_gas;
-
-  ADMaterialProperty<Real> & _e_temp;
+  const MaterialProperty<Real> & _N_A;
+  ADMaterialProperty<Real> & _sigma_pe_real;
+  ADMaterialProperty<Real> & _sigma_pe_imag;
+  const MooseEnum _coeff_type;
 };
