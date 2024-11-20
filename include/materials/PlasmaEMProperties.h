@@ -5,12 +5,12 @@
 /**
  *
  */
-class PlasmaDielectricConstant : public ADMaterial
+class PlasmaEMProperties : public ADMaterial
 {
 public:
   static InputParameters validParams();
 
-  PlasmaDielectricConstant(const InputParameters & parameters);
+  PlasmaEMProperties(const InputParameters & parameters);
 
 protected:
   virtual void computeQpProperties() override;
@@ -55,7 +55,7 @@ protected:
   const ADVariableGradient & _em_grad;
 
   /// Electron density variable
-  MooseVariable * _em_var;
+  const MooseVariable * _em_var;
 
   /// Electron density first time derivative
   const ADVariableValue & _em_dot;
@@ -64,7 +64,7 @@ protected:
   const ADVariableValue & _em_dot_dot;
 
   const MaterialProperty<Real> & _N_A;
-  const MaterialProperty<Real> & _eps;
   ADMaterialProperty<Real> & _sigma_pe_real;
   ADMaterialProperty<Real> & _sigma_pe_imag;
+  const MooseEnum _coeff_type;
 };
