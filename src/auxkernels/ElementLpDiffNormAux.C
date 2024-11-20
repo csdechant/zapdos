@@ -12,7 +12,7 @@
 
 #include "libmesh/quadrature.h"
 
-registerMooseObject("MooseApp", ElementLpDiffNormAux);
+registerMooseObject("ZapdosApp", ElementLpDiffNormAux);
 
 InputParameters
 ElementLpDiffNormAux::validParams()
