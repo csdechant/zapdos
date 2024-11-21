@@ -10,11 +10,17 @@ documentation clear for users.
 
 ## Overview
 
-!! Replace these lines with information regarding the Position object.
+`Position` returns the characteristic scaling length for a given component. Zapdos
+users can uniformly scale the position units for a given set of equations. This means
+a user can construct a normalized mesh of some factor and scale all equations to
+that same factor. `Position` is then used to plot against the any spatial results.
 
 ## Example Input File Syntax
 
-!! Describe and include an example of how to use the Position object.
+An example of how to use `Position` can be found in the
+test file `Lymberopoulos_with_argon_metastables.i`.
+
+!listing test/tests/Lymberopoulos_rf_discharge/Lymberopoulos_with_argon_metastables.i block=AuxKernels/Te
 
 !syntax parameters /AuxKernels/Position
 

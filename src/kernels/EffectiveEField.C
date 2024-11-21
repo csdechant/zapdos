@@ -22,6 +22,7 @@ EffectiveEField::validParams()
   params.addRequiredParam<unsigned>("component", "The Efield component that this is applied to.");
   params.addRequiredCoupledVar(
       "potential", "The potential acting on the electrons.");
+  params.addClassDescription("Calculates an effective E-field component for ions.");
   return params;
 }
 

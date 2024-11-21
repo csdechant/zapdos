@@ -20,6 +20,9 @@ EffectiveEFieldAdvection::validParams()
   params.addCoupledVar("v", 0, "y-Effective Efield"); // only required in 2D and 3D
   params.addCoupledVar("w", 0, "z-Effective Efield"); // only required in 3D
   params.addRequiredParam<Real>("position_units", "Units of position.");
+  params.addClassDescription(
+      "Generic electric field driven advection term for species using an "
+      "effective electric field. (Densities must be in log form.)");
   return params;
 }
 

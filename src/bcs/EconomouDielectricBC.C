@@ -26,7 +26,8 @@ EconomouDielectricBC::validParams()
   params.addParam<Real>("users_gamma",
                         "A secondary electron emission coeff. only used for this BC.");
   params.addRequiredParam<std::string>("potential_units", "The potential units.");
-  params.addClassDescription("Dielectric boundary condition"
+  params.addClassDescription("The derivative version of the dielectric boundary condition, "
+                             "requires potential values "
                              "(Based on DOI: https://doi.org/10.1116/1.579300)");
   return params;
 }

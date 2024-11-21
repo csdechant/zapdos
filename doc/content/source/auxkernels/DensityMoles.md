@@ -1,20 +1,17 @@
 # DensityMoles
 
-!alert construction title=Undocumented Class
-The DensityMoles has not been documented. The content listed below should be used as a starting point for
-documenting the class, which includes the typical automatic documentation associated with a
-MooseObject; however, what is contained is ultimately determined by what is necessary to make the
-documentation clear for users.
-
 !syntax description /AuxKernels/DensityMoles
 
 ## Overview
 
-!! Replace these lines with information regarding the DensityMoles object.
+`DensityMoles` returns the density value of a coupled molar density of the specie in log form in units of $\#/m^{3}$.
 
 ## Example Input File Syntax
 
-!! Describe and include an example of how to use the DensityMoles object.
+An example of how to use `Current` can be found in the
+test file `Lymberopoulos_with_argon_metastables.i`.
+
+!listing test/tests/Lymberopoulos_rf_discharge/Lymberopoulos_with_argon_metastables.i block=AuxKernels/em_lin
 
 !syntax parameters /AuxKernels/DensityMoles
 
