@@ -53,6 +53,7 @@ ZapdosApp::registerAll(Factory & f, ActionFactory & af, Syntax & s)
   s.registerActionSyntax("AddPeriodicControllers", "PeriodicControllers/*");
   s.registerActionSyntax("AddDriftDiffusionAction", "DriftDiffusionAction/*");
   s.registerActionSyntax("AddPeriodicRelativeNodalDifference", "PeriodicRelativeNodalDifference/*");
+  s.registerActionSyntax("AddShootingAcceleration", "ShootingAcceleration/*");
 }
 
 void

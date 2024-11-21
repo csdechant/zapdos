@@ -1,0 +1,610 @@
+#This MMS test was designed to test TimeDerivativeLog, CoeffDiffusion, EFieldAdvection,
+#CoeffDiffusionLin, ChargeSourceMoles_KV, JouleHeating,
+#ThermalConductivityDiffusion, EffectiveEFieldAdvection, EffectiveEField and ADHeavySpecies .
+
+[Mesh]
+  [gen]
+    type = GeneratedMeshGenerator
+    dim = 2
+    xmin = 0
+    xmax = 1
+    ymin = 0
+    ymax = 1
+    nx = 4
+    ny = 4
+  []
+[]
+
+[Problem]
+  type = FEProblem
+[]
+
+[Variables]
+  [./em]
+  [../]
+  [./potential]
+  [../]
+  [./ion]
+  [../]
+  [./mean_en]
+  [../]
+
+  [./Ex]
+  [../]
+  [./Ey]
+  [../]
+[]
+
+[Kernels]
+#Electron Equations
+  [./em_time_derivative]
+    type = TimeDerivativeLog
+    variable = em
+  [../]
+  [./em_diffusion]
+    type = CoeffDiffusion
+    variable = em
+    position_units = 1.0
+  [../]
+  [./em_advection]
+    type = EFieldAdvection
+    variable = em
+    mean_en = mean_en
+    potential = 'potential'
+    position_units = 1.0
+  [../]
+  [./em_source]
+    type = BodyForce
+    variable = em
+    function = 'em_source'
+  [../]
+
+#Ion Equations
+  [./ion_time_derivative]
+    type = TimeDerivativeLog
+    variable = ion
+  [../]
+  [./ion_diffusion]
+    type = CoeffDiffusion
+    variable = ion
+    position_units = 1.0
+  [../]
+  [./ion_advection]
+    type = EffectiveEFieldAdvection
+    variable = ion
+    u = Ex
+    v = Ey
+    position_units = 1.0
+  [../]
+  [./ion_source]
+    type = BodyForce
+    variable = ion
+    function = 'ion_source'
+  [../]
+
+#Potential Equations
+  [./potential_diffusion]
+    type = CoeffDiffusionLin
+    variable = potential
+    position_units = 1.0
+  [../]
+  [./ion_charge_source]
+    type = ChargeSourceMoles_KV
+    variable = potential
+    charged = ion
+    potential_units = V
+  [../]
+  [./em_charge_source]
+    type = ChargeSourceMoles_KV
+    variable = potential
+    charged = em
+    potential_units = V
+  [../]
+
+#Eff. Efield
+  [./EffEfield_X_time_deriv]
+    type = TimeDerivative
+    variable = Ex
+  [../]
+  [./EffEfield_X_ForceBody]
+    type = EffectiveEField
+    variable = Ex
+    potential = potential
+    ions = ion
+    component = 0
+    position_units = 1.0
+  [../]
+  [./EffEfield_Y_time_deriv]
+    type = TimeDerivative
+    variable = Ey
+  [../]
+  [./EffEfield_Y_ForceBody]
+    type = EffectiveEField
+    variable = Ey
+    potential = potential
+    ions = ion
+    component = 1
+    position_units = 1.0
+  [../]
+
+#Electron Energy Equations
+  [./mean_en_time_deriv]
+    type = TimeDerivativeLog
+    variable = mean_en
+  [../]
+  [./mean_en_advection]
+    type = EFieldAdvection
+    variable = mean_en
+    potential = potential
+    position_units = 1.0
+  [../]
+  [./mean_en_diffusion]
+    type = CoeffDiffusion
+    variable = mean_en
+    position_units = 1.0
+  [../]
+  [./mean_en_diffusion_correction]
+    type = ThermalConductivityDiffusion
+    variable = mean_en
+    em = em
+    position_units = 1.0
+  [../]
+  [./mean_en_joule_heating]
+    type = JouleHeating
+    variable = mean_en
+    potential = potential
+    em = em
+    position_units = 1.0
+    potential_units = V
+  [../]
+  [./mean_en_source]
+    type = BodyForce
+    variable = mean_en
+    function = 'energy_source'
+  [../]
+[]
+
+[AuxVariables]
+  [./potential_sol]
+  [../]
+
+  [./mean_en_sol]
+  [../]
+
+  [./em_sol]
+  [../]
+
+  [./ion_sol]
+  [../]
+
+  [./Ex_sol]
+  [../]
+  [./Ey_sol]
+  [../]
+[]
+
+[AuxKernels]
+  [./potential_sol]
+    type = FunctionAux
+    variable = potential_sol
+    function = potential_fun
+  [../]
+
+  [./mean_en_sol]
+    type = FunctionAux
+    variable = mean_en_sol
+    function = mean_en_fun
+  [../]
+
+  [./em_sol]
+    type = FunctionAux
+    variable = em_sol
+    function = em_fun
+  [../]
+
+  [./ion_sol]
+    type = FunctionAux
+    variable = ion_sol
+    function = ion_fun
+  [../]
+
+  [./Ex_sol]
+    type = FunctionAux
+    variable = Ex_sol
+    function = Ex_fun
+  [../]
+  [./Ey_sol]
+    type = FunctionAux
+    variable = Ey_sol
+    function = Ey_fun
+  [../]
+[]
+
+[Functions]
+#Scaling factors to scale the known solutios to a mesh
+  [./x_max]
+    type = ConstantFunction
+    value = 1.0
+  [../]
+  [./y_max]
+    type = ConstantFunction
+    value = 1.0
+  [../]
+
+#The frequency of oscillation
+  [./f]
+    type = ConstantFunction
+    value = 1.0
+  [../]
+
+#Material Variables
+  #Electron diffusion coeff.
+  [./diffem_coeff]
+    type = ConstantFunction
+    value = 0.05
+  [../]
+  #Electron mobility coeff.
+  [./muem_coeff]
+    type = ConstantFunction
+    value = 0.01
+  [../]
+  #Electron energy diffusion coeff.
+  [./diffmean_en_coeff]
+    type = ParsedFunction
+    vars = 'diffem_coeff'
+    vals = 'diffem_coeff'
+    value = '5.0 / 3.0 * diffem_coeff'
+  [../]
+  #Electron energy mobility coeff.
+  [./mumean_en_coeff]
+    type = ParsedFunction
+    vars = 'muem_coeff'
+    vals = 'muem_coeff'
+    value = '5.0 / 3.0 * muem_coeff'
+  [../]
+  #Ion diffusion coeff.
+  [./diffion]
+    type = ConstantFunction
+    value = 0.1
+  [../]
+  #Ion mobility coeff.
+  [./muion]
+    type = ConstantFunction
+    value = 0.025
+  [../]
+  #Avogadro's number
+  [./N_A]
+    type = ConstantFunction
+    value = 1.0
+  [../]
+  #Elementary Charge
+  [./ee]
+    type = ConstantFunction
+    value = 1.0
+  [../]
+  #Permittivity of Free Space - "Potential diffusion coeff."
+  [./diffpotential]
+    type = ConstantFunction
+    value = 0.01
+  [../]
+
+  #Coeff. found in mean energy solution (to avoid rounding error in the .py source file)
+  [./coeff]
+    type = ParsedFunction
+    value = '5.0 / 3.0'
+  [../]
+
+
+#Manufactured Solutions
+  #The manufactured electron density solution
+  [./em_fun]
+    type = ParsedFunction
+    vars = 'N_A x_max y_max f'
+    vals = 'N_A x_max y_max f'
+    value = 'log((sin(pi*(y/y_max)) + 0.2*sin(2*pi*t*f)*cos(pi*(y/y_max)) + 1.0 + cos(pi/2*(x/x_max))) / N_A)'
+  [../]
+  #The manufactured ion density solution
+  [./ion_fun]
+    type = ParsedFunction
+    vars = 'N_A x_max y_max f'
+    vals = 'N_A x_max y_max f'
+    value = 'log((sin(pi*(y/y_max)) + 1.0 + 0.9*cos(pi/2*(x/x_max))) / N_A)'
+  [../]
+  #The manufactured electron density solution
+  [./potential_fun]
+    type = ParsedFunction
+    vars = 'ee diffpotential x_max y_max f'
+    vals = 'ee diffpotential x_max y_max f'
+    value = '-(ee*(2*x_max^2*cos((pi*x)/(2*x_max)) + y_max^2*cos((pi*y)/y_max)*sin(2*pi*f*t)))/(5*diffpotential*pi^2)'
+  [../]
+  #The manufactured electron energy solution
+  [./energy_fun]
+    type = ParsedFunction
+    vars = 'N_A x_max y_max f'
+    vals = 'N_A x_max y_max f'
+    value = 'sin(pi*(y/y_max)) + sin(2*pi*t*f)*cos(pi*(y/y_max))*sin(pi*(y/y_max)) + 0.75 + cos(pi/2*(x/x_max))'
+  [../]
+  [./mean_en_fun]
+    type = ParsedFunction
+    vars = 'energy_fun em_fun'
+    vals = 'energy_fun em_fun'
+    value = 'log(energy_fun) + em_fun'
+  [../]
+  #The manufactured eff. Efield solution
+  [./Ex_fun]
+    type = ParsedFunction
+    vars = 'ee diffpotential x_max y_max f'
+    vals = 'ee diffpotential x_max y_max f'
+    value = '-(ee*x_max*exp(-5*t)*sin((pi*x)/(2*x_max))*(exp(5*t) - 1))/(5*diffpotential*pi)'
+  [../]
+  [./Ey_fun]
+    type = ParsedFunction
+    vars = 'ee diffpotential x_max y_max f'
+    vals = 'ee diffpotential x_max y_max f'
+    value = '-exp(-5*t)*((2*ee*f*y_max*sin((pi*y)/y_max))/(diffpotential*(4*f^2*pi^2 + 25)) - 1/10) -
+             (ee*y_max*sin((pi*y)/y_max)*(5*sin(2*pi*f*t) - 2*f*pi*cos(2*pi*f*t)))/(diffpotential*pi*(4*f^2*pi^2 + 25))'
+  [../]
+
+  #Electron diffusion coeff.
+  [./diffem]
+    type = ParsedFunction
+    vars = 'diffem_coeff energy_fun'
+    vals = 'diffem_coeff energy_fun'
+    value = 'diffem_coeff * energy_fun'
+  [../]
+  #Electron mobility coeff.
+  [./muem]
+    type = ParsedFunction
+    vars = 'muem_coeff energy_fun'
+    vals = 'muem_coeff energy_fun'
+    value = 'muem_coeff * energy_fun'
+  [../]
+  #Electron energy diffusion coeff.
+  [./diffmean_en]
+    type = ParsedFunction
+    vars = 'diffmean_en_coeff energy_fun'
+    vals = 'diffmean_en_coeff energy_fun'
+    value = 'diffmean_en_coeff * energy_fun'
+  [../]
+  #Electron energy mobility coeff.
+  [./mumean_en]
+    type = ParsedFunction
+    vars = 'mumean_en_coeff energy_fun'
+    vals = 'mumean_en_coeff energy_fun'
+    value = 'mumean_en_coeff * energy_fun'
+  [../]
+
+#Source Terms in moles
+  #The electron source term.
+  [em_source]
+    type = ParsedFunction
+    value = '-diffem_coeff*(-pi^2*sin(y*pi/y_max)/y_max^2 - 0.2*pi^2*sin(2*pi*f*t)*cos(y*pi/y_max)/y_max^2)*(sin(y*pi/y_max)*sin(2*pi*f*t)*cos(y*pi/y_max) + sin(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 0.75)/N_A - diffem_coeff*(-0.2*pi*sin(y*pi/y_max)*sin(2*pi*f*t)/y_max + pi*cos(y*pi/y_max)/y_max)*(-pi*sin(y*pi/y_max)^2*sin(2*pi*f*t)/y_max + pi*sin(2*pi*f*t)*cos(y*pi/y_max)^2/y_max + pi*cos(y*pi/y_max)/y_max)/N_A + (1/4)*pi^2*diffem_coeff*(sin(y*pi/y_max)*sin(2*pi*f*t)*cos(y*pi/y_max) + sin(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 0.75)*cos((1/2)*x*pi/x_max)/(N_A*x_max^2) - 1/4*pi^2*diffem_coeff*sin((1/2)*x*pi/x_max)^2/(N_A*x_max^2) + 0.4*pi*f*cos(y*pi/y_max)*cos(2*pi*f*t)/N_A + (1/5)*ee*muem_coeff*y_max*(-0.2*pi*sin(y*pi/y_max)*sin(2*pi*f*t)/y_max + pi*cos(y*pi/y_max)/y_max)*(sin(y*pi/y_max)*sin(2*pi*f*t)*cos(y*pi/y_max) + sin(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 0.75)*sin(y*pi/y_max)*sin(2*pi*f*t)/(pi*N_A*diffpotential) + (1/5)*ee*muem_coeff*y_max*(-pi*sin(y*pi/y_max)^2*sin(2*pi*f*t)/y_max + pi*sin(2*pi*f*t)*cos(y*pi/y_max)^2/y_max + pi*cos(y*pi/y_max)/y_max)*(sin(y*pi/y_max) + 0.2*sin(2*pi*f*t)*cos(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 1.0)*sin(y*pi/y_max)*sin(2*pi*f*t)/(pi*N_A*diffpotential) + (1/5)*ee*muem_coeff*(sin(y*pi/y_max)*sin(2*pi*f*t)*cos(y*pi/y_max) + sin(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 0.75)*(sin(y*pi/y_max) + 0.2*sin(2*pi*f*t)*cos(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 1.0)*sin(2*pi*f*t)*cos(y*pi/y_max)/(N_A*diffpotential) + (1/10)*ee*muem_coeff*(sin(y*pi/y_max)*sin(2*pi*f*t)*cos(y*pi/y_max) + sin(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 0.75)*(sin(y*pi/y_max) + 0.2*sin(2*pi*f*t)*cos(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 1.0)*cos((1/2)*x*pi/x_max)/(N_A*diffpotential) - 1/10*ee*muem_coeff*(sin(y*pi/y_max)*sin(2*pi*f*t)*cos(y*pi/y_max) + sin(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 0.75)*sin((1/2)*x*pi/x_max)^2/(N_A*diffpotential) - 1/10*ee*muem_coeff*(sin(y*pi/y_max) + 0.2*sin(2*pi*f*t)*cos(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 1.0)*sin((1/2)*x*pi/x_max)^2/(N_A*diffpotential)'
+    vars = 'y_max muem_coeff f N_A ee diffpotential x_max diffem_coeff'
+    vals = 'y_max muem_coeff f N_A ee diffpotential x_max diffem_coeff'
+  []
+
+  #The ion source term.
+  [ion_source]
+    type = ParsedFunction
+    value = 'pi^2*diffion*sin(y*pi/y_max)/(N_A*y_max^2) + 0.225*pi^2*diffion*cos((1/2)*x*pi/x_max)/(N_A*x_max^2) + muion*(-2*pi*ee*f*exp(-5*t)*cos(y*pi/y_max)/(diffpotential*(4*pi^2*f^2 + 25)) - ee*(-2*pi*f*cos(2*pi*f*t) + 5*sin(2*pi*f*t))*cos(y*pi/y_max)/(diffpotential*(4*pi^2*f^2 + 25)))*(sin(y*pi/y_max) + 0.9*cos((1/2)*x*pi/x_max) + 1.0)/N_A + pi*muion*(-(-0.1 + 2*ee*f*y_max*sin(y*pi/y_max)/(diffpotential*(4*pi^2*f^2 + 25)))*exp(-5*t) - ee*y_max*(-2*pi*f*cos(2*pi*f*t) + 5*sin(2*pi*f*t))*sin(y*pi/y_max)/(pi*diffpotential*(4*pi^2*f^2 + 25)))*cos(y*pi/y_max)/(N_A*y_max) - 1/10*ee*muion*(exp(5*t) - 1)*(sin(y*pi/y_max) + 0.9*cos((1/2)*x*pi/x_max) + 1.0)*exp(-5*t)*cos((1/2)*x*pi/x_max)/(N_A*diffpotential) + 0.09*ee*muion*(exp(5*t) - 1)*exp(-5*t)*sin((1/2)*x*pi/x_max)^2/(N_A*diffpotential)'
+    vars = 'y_max f N_A ee diffion diffpotential muion x_max'
+    vals = 'y_max f N_A ee diffion diffpotential muion x_max'
+  []
+
+  #The mean energy density source term.
+  [energy_source]
+    type = ParsedFunction
+    value = 'coeff*(-diffem_coeff*(-0.2*pi*sin(y*pi/y_max)*sin(2*pi*f*t)/y_max + pi*cos(y*pi/y_max)/y_max)*(sin(y*pi/y_max)*sin(2*pi*f*t)*cos(y*pi/y_max) + sin(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 0.75)/N_A + (1/5)*ee*muem_coeff*y_max*(sin(y*pi/y_max)*sin(2*pi*f*t)*cos(y*pi/y_max) + sin(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 0.75)*(sin(y*pi/y_max) + 0.2*sin(2*pi*f*t)*cos(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 1.0)*sin(y*pi/y_max)*sin(2*pi*f*t)/(pi*N_A*diffpotential))*(-pi*sin(y*pi/y_max)^2*sin(2*pi*f*t)/y_max + pi*sin(2*pi*f*t)*cos(y*pi/y_max)^2/y_max + pi*cos(y*pi/y_max)/y_max) + coeff*(sin(y*pi/y_max)*sin(2*pi*f*t)*cos(y*pi/y_max) + sin(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 0.75)*(-diffem_coeff*(-pi^2*sin(y*pi/y_max)/y_max^2 - 0.2*pi^2*sin(2*pi*f*t)*cos(y*pi/y_max)/y_max^2)*(sin(y*pi/y_max)*sin(2*pi*f*t)*cos(y*pi/y_max) + sin(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 0.75)/N_A - diffem_coeff*(-0.2*pi*sin(y*pi/y_max)*sin(2*pi*f*t)/y_max + pi*cos(y*pi/y_max)/y_max)*(-pi*sin(y*pi/y_max)^2*sin(2*pi*f*t)/y_max + pi*sin(2*pi*f*t)*cos(y*pi/y_max)^2/y_max + pi*cos(y*pi/y_max)/y_max)/N_A + (1/5)*ee*muem_coeff*y_max*(-0.2*pi*sin(y*pi/y_max)*sin(2*pi*f*t)/y_max + pi*cos(y*pi/y_max)/y_max)*(sin(y*pi/y_max)*sin(2*pi*f*t)*cos(y*pi/y_max) + sin(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 0.75)*sin(y*pi/y_max)*sin(2*pi*f*t)/(pi*N_A*diffpotential) + (1/5)*ee*muem_coeff*y_max*(-pi*sin(y*pi/y_max)^2*sin(2*pi*f*t)/y_max + pi*sin(2*pi*f*t)*cos(y*pi/y_max)^2/y_max + pi*cos(y*pi/y_max)/y_max)*(sin(y*pi/y_max) + 0.2*sin(2*pi*f*t)*cos(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 1.0)*sin(y*pi/y_max)*sin(2*pi*f*t)/(pi*N_A*diffpotential) + (1/5)*ee*muem_coeff*(sin(y*pi/y_max)*sin(2*pi*f*t)*cos(y*pi/y_max) + sin(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 0.75)*(sin(y*pi/y_max) + 0.2*sin(2*pi*f*t)*cos(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 1.0)*sin(2*pi*f*t)*cos(y*pi/y_max)/(N_A*diffpotential)) + coeff*(sin(y*pi/y_max)*sin(2*pi*f*t)*cos(y*pi/y_max) + sin(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 0.75)*((1/4)*pi^2*diffem_coeff*(sin(y*pi/y_max)*sin(2*pi*f*t)*cos(y*pi/y_max) + sin(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 0.75)*cos((1/2)*x*pi/x_max)/(N_A*x_max^2) - 1/4*pi^2*diffem_coeff*sin((1/2)*x*pi/x_max)^2/(N_A*x_max^2) + (1/10)*ee*muem_coeff*(sin(y*pi/y_max)*sin(2*pi*f*t)*cos(y*pi/y_max) + sin(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 0.75)*(sin(y*pi/y_max) + 0.2*sin(2*pi*f*t)*cos(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 1.0)*cos((1/2)*x*pi/x_max)/(N_A*diffpotential) - 1/10*ee*muem_coeff*(sin(y*pi/y_max)*sin(2*pi*f*t)*cos(y*pi/y_max) + sin(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 0.75)*sin((1/2)*x*pi/x_max)^2/(N_A*diffpotential) - 1/10*ee*muem_coeff*(sin(y*pi/y_max) + 0.2*sin(2*pi*f*t)*cos(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 1.0)*sin((1/2)*x*pi/x_max)^2/(N_A*diffpotential)) - 1/2*pi*coeff*((1/2)*pi*diffem_coeff*(sin(y*pi/y_max)*sin(2*pi*f*t)*cos(y*pi/y_max) + sin(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 0.75)*sin((1/2)*x*pi/x_max)/(N_A*x_max) + (1/5)*ee*muem_coeff*x_max*(sin(y*pi/y_max)*sin(2*pi*f*t)*cos(y*pi/y_max) + sin(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 0.75)*(sin(y*pi/y_max) + 0.2*sin(2*pi*f*t)*cos(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 1.0)*sin((1/2)*x*pi/x_max)/(pi*N_A*diffpotential))*sin((1/2)*x*pi/x_max)/x_max + diffem_coeff*((1/5)*ee*y_max*(-0.2*pi*sin(y*pi/y_max)*sin(2*pi*f*t)/y_max + pi*cos(y*pi/y_max)/y_max)*sin(y*pi/y_max)*sin(2*pi*f*t)/(pi*N_A*diffpotential) - 1/10*ee*sin((1/2)*x*pi/x_max)^2/(N_A*diffpotential))*(sin(y*pi/y_max)*sin(2*pi*f*t)*cos(y*pi/y_max) + sin(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 0.75) - diffem_coeff*(-0.2*pi*sin(y*pi/y_max)*sin(2*pi*f*t)/y_max + pi*cos(y*pi/y_max)/y_max)*(-pi*sin(y*pi/y_max)^2*sin(2*pi*f*t)/y_max + pi*sin(2*pi*f*t)*cos(y*pi/y_max)^2/y_max + pi*cos(y*pi/y_max)/y_max)*(sin(y*pi/y_max)*sin(2*pi*f*t)*cos(y*pi/y_max) + sin(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 0.75)/N_A - diffem_coeff*(-4*pi^2*sin(y*pi/y_max)*sin(2*pi*f*t)*cos(y*pi/y_max)/y_max^2 - pi^2*sin(y*pi/y_max)/y_max^2)*(sin(y*pi/y_max)*sin(2*pi*f*t)*cos(y*pi/y_max) + sin(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 0.75)*(sin(y*pi/y_max) + 0.2*sin(2*pi*f*t)*cos(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 1.0)/N_A - diffem_coeff*(-pi*sin(y*pi/y_max)^2*sin(2*pi*f*t)/y_max + pi*sin(2*pi*f*t)*cos(y*pi/y_max)^2/y_max + pi*cos(y*pi/y_max)/y_max)^2*(sin(y*pi/y_max) + 0.2*sin(2*pi*f*t)*cos(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 1.0)/N_A + (1/4)*pi^2*diffem_coeff*(sin(y*pi/y_max)*sin(2*pi*f*t)*cos(y*pi/y_max) + sin(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 0.75)*(sin(y*pi/y_max) + 0.2*sin(2*pi*f*t)*cos(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 1.0)*cos((1/2)*x*pi/x_max)/(N_A*x_max^2) - 1/4*pi^2*diffem_coeff*(sin(y*pi/y_max)*sin(2*pi*f*t)*cos(y*pi/y_max) + sin(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 0.75)*sin((1/2)*x*pi/x_max)^2/(N_A*x_max^2) - 1/4*pi^2*diffem_coeff*(sin(y*pi/y_max) + 0.2*sin(2*pi*f*t)*cos(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 1.0)*sin((1/2)*x*pi/x_max)^2/(N_A*x_max^2) + 0.4*pi*f*(sin(y*pi/y_max)*sin(2*pi*f*t)*cos(y*pi/y_max) + sin(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 0.75)*cos(y*pi/y_max)*cos(2*pi*f*t)/N_A + 2*pi*f*(sin(y*pi/y_max) + 0.2*sin(2*pi*f*t)*cos(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 1.0)*sin(y*pi/y_max)*cos(y*pi/y_max)*cos(2*pi*f*t)/N_A - muem_coeff*((1/25)*ee^2*x_max^2*sin((1/2)*x*pi/x_max)^2/(pi^2*diffpotential^2) + (1/25)*ee^2*y_max^2*sin(y*pi/y_max)^2*sin(2*pi*f*t)^2/(pi^2*diffpotential^2))*(sin(y*pi/y_max)*sin(2*pi*f*t)*cos(y*pi/y_max) + sin(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 0.75)*(sin(y*pi/y_max) + 0.2*sin(2*pi*f*t)*cos(y*pi/y_max) + cos((1/2)*x*pi/x_max) + 1.0)/N_A'
+    vars = 'y_max muem_coeff coeff f N_A ee diffpotential x_max diffem_coeff'
+    vals = 'y_max muem_coeff coeff f N_A ee diffpotential x_max diffem_coeff'
+  []
+
+
+
+  [./em_ICs]
+    type = ParsedFunction
+    vars = 'N_A'
+    vals = 'N_A'
+    value = 'log((3.0 + cos(pi/2*x)) / N_A)'
+  [../]
+  [./ion_ICs]
+    type = ParsedFunction
+    vars = 'N_A'
+    vals = 'N_A'
+    value = 'log((3.0 + 0.9*cos(pi/2*x)) / N_A)'
+  [../]
+  [./mean_en_ICs]
+    type = ParsedFunction
+    vars = 'em_ICs'
+    vals = 'em_ICs'
+    value = 'log(3./2. + cos(pi/2*x)) + em_ICs'
+  [../]
+[]
+
+[ICs]
+  [./em_ICs]
+    type = FunctionIC
+    variable = em
+    function = em_ICs
+  [../]
+  [./ion_ICs]
+    type = FunctionIC
+    variable = ion
+    function = ion_ICs
+  [../]
+  [./mean_en_ICs]
+    type = FunctionIC
+    variable = mean_en
+    function = mean_en_ICs
+  [../]
+[]
+
+[BCs]
+  [./potential_left_BC]
+    type = FunctionDirichletBC
+    variable = potential
+    function = 'potential_fun'
+    boundary = '0 1 2 3'
+    preset = true
+  [../]
+
+  [./em_left_BC]
+    type = FunctionDirichletBC
+    variable = em
+    function = 'em_fun'
+    boundary = '0 1 2 3'
+    preset = true
+  [../]
+
+  [./ion_left_BC]
+    type = FunctionDirichletBC
+    variable = ion
+    function = 'ion_fun'
+    boundary = '0 1 2 3'
+    preset = true
+  [../]
+
+  [./energy_left_BC]
+    type = FunctionDirichletBC
+    variable = mean_en
+    function = 'mean_en_fun'
+    boundary = '0 1 2 3'
+    preset = true
+  [../]
+
+  [./Ex_left_BC]
+    type = FunctionDirichletBC
+    variable = Ex
+    function = 'Ex_fun'
+    boundary = '0 1 2 3'
+    preset = true
+  [../]
+
+  [./Ey_left_BC]
+    type = FunctionDirichletBC
+    variable = Ey
+    function = 'Ey_fun'
+    boundary = '0 1 2 3'
+    preset = true
+  [../]
+[]
+
+[Materials]
+  [./Material_Coeff]
+    type = GenericFunctionMaterial
+    prop_names =  'e N_A'
+    prop_values = 'ee N_A'
+  [../]
+  [./ADMaterial_Coeff_Set1]
+    type = ADGenericFunctionMaterial
+    prop_names =  'diffpotential'
+    prop_values = 'diffpotential'
+  [../]
+  [./Material_Coeff_Set2]
+    type = ADMMSEEDFRates
+    electrons = em
+    mean_energy = mean_en
+    prop_names =              'diffem        muem        diffmean_en        mumean_en'
+    prop_values =             'diffem        muem        diffmean_en        mumean_en'
+    d_prop_d_actual_mean_en = 'diffem_coeff  muem_coeff  diffmean_en_coeff  mumean_en_coeff'
+  [../]
+  [./Charge_Signs]
+    type = GenericConstantMaterial
+    prop_names =  'sgnem  sgnmean_en'
+    prop_values = '-1.0   -1.0'
+  [../]
+  [./gas_species_0]
+    type = ADHeavySpecies
+    heavy_species_name = ion
+    heavy_species_mass = 12.816e-19
+    heavy_species_charge = 1.0
+    mobility = 0.025
+    diffusivity = 0.1
+    potential_units = V
+  [../]
+  [./Material_Coeff_For_HeavySpecies]
+    type = GenericFunctionMaterial
+    prop_names =  'T_gas p_gas'
+    prop_values = '300   133.33'
+  [../]
+[]
+
+[Postprocessors]
+  [./em_l2Error]
+    type = ElementL2Error
+    variable = em
+    function = em_fun
+  [../]
+  [./ion_l2Error]
+    type = ElementL2Error
+    variable = ion
+    function = ion_fun
+  [../]
+  [./potential_l2Error]
+    type = ElementL2Error
+    variable = potential
+    function = potential_fun
+  [../]
+  [./mean_en_l2Error]
+    type = ElementL2Error
+    variable = mean_en
+    function = mean_en_fun
+  [../]
+
+  [./Ex_l2Error]
+    type = ElementL2Error
+    variable = Ex
+    function = Ex_fun
+  [../]
+  [./Ey_l2Error]
+    type = ElementL2Error
+    variable = Ey
+    function = Ey_fun
+  [../]
+
+  [./h]
+    type = AverageElementSize
+  [../]
+[]
+
+[Preconditioning]
+  active = 'smp'
+  [./smp]
+    type = SMP
+    full = true
+  [../]
+
+  [./fdp]
+    type = FDP
+    full = true
+  [../]
+[]
+
+[Executioner]
+  type = Transient
+  start_time = 0
+  end_time = 51
+  #dt = 0.05
+  #dt = 0.025
+  dt = 0.01
+  #dt = 0.008
+  #dt = 0.005
+
+
+  automatic_scaling = true
+  compute_scaling_once = false
+  petsc_options = '-snes_converged_reason -snes_linesearch_monitor'
+  solve_type = NEWTON
+  line_search = none
+  petsc_options_iname = '-pc_type -pc_factor_shift_type -pc_factor_shift_amount'
+  petsc_options_value = 'lu NONZERO 1.e-10'
+
+  scheme = bdf2
+
+  nl_abs_tol = 1e-13
+[]
+
+[Outputs]
+  exodus = true
+  csv = true
+[]

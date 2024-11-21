@@ -86,6 +86,10 @@ AddDriftDiffusionAction::validParams()
       "Additional_Outputs",
       "Current list of available ouputs options in this action: Current, ElectronTemperature,"
       " EField");
+  params.addClassDescription(
+    "This Action automatically adds the necessary kernels if the Drift Diffusion approximation, "
+    "which includes the time derivatives and fluxes for each species and the electrostatic "
+    "approximation.");
   return params;
 }
 

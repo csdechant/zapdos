@@ -38,6 +38,8 @@ protected:
   GenericMaterialProperty<Real, is_ad> & _muHeavy;          // Replaces _muArp
   GenericMaterialProperty<Real, is_ad> & _diffHeavy;        // Replaces _diffArp
 
+  GenericMaterialProperty<Real, is_ad> & _nu;
+
   const MaterialProperty<Real> & _T_gas;
   const MaterialProperty<Real> & _p_gas;
 

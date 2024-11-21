@@ -51,6 +51,8 @@ HeavySpeciesTempl<is_ad>::HeavySpeciesTempl(const InputParameters & parameters)
         declareGenericProperty<Real, is_ad>("mu" + getParam<std::string>("heavy_species_name"))),
     _diffHeavy(
         declareGenericProperty<Real, is_ad>("diff" + getParam<std::string>("heavy_species_name"))),
+    _nu(
+        declareGenericProperty<Real, is_ad>("nu" + getParam<std::string>("heavy_species_name"))),
     _T_gas(getMaterialProperty<Real>("T_gas")),
     _p_gas(getMaterialProperty<Real>("p_gas")),
     _time_units(getParam<Real>("time_units"))
@@ -125,6 +127,13 @@ HeavySpeciesTempl<is_ad>::computeQpProperties()
     _diffHeavy[_qp] =
         0.004 * _time_units / (760. * _p_gas[_qp] / 1.01E5); // covert to m^2 and include press
   }
+
+  //Calculating the momentum-transfer frequency.
+  //For reference, see https://doi.org/10.1063/1.354487)
+  if (_muHeavy[_qp] == 0.0)
+    _nu[_qp] = 0.0;
+  else
+    _nu[_qp] = 1.602e-19 / (_muHeavy[_qp] * _massHeavy[_qp]);
 
   /*
   if (isParamValid("mobility"))

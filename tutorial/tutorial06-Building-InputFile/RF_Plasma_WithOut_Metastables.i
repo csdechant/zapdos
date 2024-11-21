@@ -79,6 +79,7 @@ dom0Scale=25.4e-3
     type = FunctionAux
     variable = Ar
     function = 'log(3.22e22/6.022e23)'
+
     execute_on = INITIAL
   [../]
 []
