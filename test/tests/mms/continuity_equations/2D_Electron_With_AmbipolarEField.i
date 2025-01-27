@@ -1,9 +1,8 @@
 [Mesh]
-  [gmg]
-    type = GeneratedMeshGenerator
-    dim = 2
-    nx = 10
-    ny = 10
+  [geo]
+    type = FileMeshGenerator
+    file = '2D_Electron_With_AmbipolarEField_IC_out.e'
+    use_for_exodus_restart = true
   []
 []
 
@@ -13,7 +12,7 @@
 
 [Variables]
   [em]
-    # initial_from_file_var = em
+    initial_from_file_var = em
   []
 
   [EField]
@@ -22,16 +21,16 @@
   []
 []
 
-[ICs]
-  [em_IC]
-    type = FunctionIC
-    function = em_ICs
-    variable = em
-  []
-[]
+# [ICs]
+#   [em_IC]
+#     type = FunctionIC
+#     function = em_ICs
+#     variable = em
+#   []
+# []
 
 [Kernels]
-#Electron Equations
+  #Electron Equations
   [em_time_derivative]
     type = TimeDerivativeLog
     variable = em
@@ -86,7 +85,7 @@
 []
 
 [Functions]
-#Material Variables
+  #Material Variables
   #Electron diffusion coeff.
   [diffem]
     type = ConstantFunction
@@ -117,8 +116,7 @@
     value = 1.0
   []
 
-
-#Manufactured Solutions
+  #Manufactured Solutions
   #The manufactured electron density solution
   [em_fun]
     type = ParsedFunction
@@ -135,7 +133,7 @@
     expression_y = '(-diffem + diffion)*(-0.2*pi*sin(y*pi)*sin(2*pi*t) + pi*cos(y*pi))/((-muem + muion)*(sin(y*pi) + 0.2*sin(2*pi*t)*cos(y*pi) + cos((1/2)*x*pi) + 1.0))'
   []
 
-#Source Terms in moles
+  #Source Terms in moles
   #The electron source term.
   [em_source]
     type = ParsedFunction
@@ -177,17 +175,17 @@
   []
   [Material_Coeff]
     type = GenericFunctionMaterial
-    prop_names =  'e N_A'
+    prop_names = 'e N_A'
     prop_values = 'ee N_A'
   []
   [ADMaterial_Coeff]
     type = ADGenericFunctionMaterial
-    prop_names =  'diffem  muem  diffion  muion'
+    prop_names = 'diffem  muem  diffion  muion'
     prop_values = 'diffem  muem  diffion  muion'
   []
   [Charge_Signs]
     type = GenericConstantMaterial
-    prop_names =  'sgnem'
+    prop_names = 'sgnem'
     prop_values = '-1.0'
   []
 []
@@ -225,18 +223,13 @@
 
 [Executioner]
   type = Transient
-  start_time = 0
-  end_time = 50
-  # dt = 0.05
-  # dt = 0.025
-  #dt = 0.0125
+  # start_time = 0
+  # end_time = 50
+  start_time = 50
+  end_time = 51
 
-  # dt = 0.01
-
-  # dt = 0.005
-
-  dt = 0.008
-  
+  # dt = 0.008
+  dt = 0.02
 
   automatic_scaling = true
   compute_scaling_once = false
@@ -252,6 +245,6 @@
 []
 
 [Outputs]
-  csv = true
   exodus = true
+  interval = 10
 []
