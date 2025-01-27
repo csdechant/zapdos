@@ -9,8 +9,8 @@
   [./gmg]
     type = GeneratedMeshGenerator
     dim = 2
-    nx = 40
-    ny = 40
+    nx = 150
+    ny = 150
     elem_type = QUAD9
   [../]
 []
@@ -68,12 +68,21 @@
   [./dielectric_image]
   [../]
 
-  [./dielectric_real_grad]
-    family = LAGRANGE_VEC
+  [./d_dielectric_real_dt]
+    family = MONOMIAL
     order = FIRST
   [../]
-  [./dielectric_image_grad]
-    family = LAGRANGE_VEC
+  [./d_dielectric_image_dt]
+    family = MONOMIAL
+    order = FIRST
+  [../]
+
+  [./d2_dielectric_real_dt2]
+    family = MONOMIAL
+    order = FIRST
+  [../]
+  [./d2_dielectric_image_dt2]
+    family = MONOMIAL
     order = FIRST
   [../]
 []
@@ -103,15 +112,26 @@
     function = dielectric_image_fun
   [../]
 
-  [./dielectric_real_grad]
-    type = VectorFunctionAux
-    variable = dielectric_real_grad
-    function = dielectric_real_grad_fun
+  [./d_dielectric_real_dt]
+    type = ADMaterialRealAux
+    variable = d_dielectric_real_dt
+    property = plasma_dielectric_constant_real_dot
   [../]
-  [./dielectric_image_grad]
-    type = VectorFunctionAux
-    variable = dielectric_image_grad
-    function = dielectric_image_grad_fun
+  [./d_dielectric_image_dt]
+    type = ADMaterialRealAux
+    variable = d_dielectric_image_dt
+    property = plasma_dielectric_constant_imag_dot
+  [../]
+
+  [./d2_dielectric_real_dt2]
+    type = ADMaterialRealAux
+    variable = d2_dielectric_real_dt2
+    property = plasma_dielectric_constant_real_dot_dot
+  [../]
+  [./d2_dielectric_image_dt2]
+    type = ADMaterialRealAux
+    variable = d2_dielectric_image_dt2
+    property = plasma_dielectric_constant_imag_dot_dot
   [../]
 []
 
@@ -213,19 +233,30 @@
     symbol_values = 'omega m_e ec nu epsilon_0'
   []
 
-  [dielectric_real_grad_fun]
-    type = ParsedVectorFunction
+  [d_dielectric_real_dt_fun]
+    type = ParsedFunction
     symbol_names =  'omega m_e ec nu epsilon_0'
     symbol_values = 'omega m_e ec nu epsilon_0'
-    expression_x = '(1/2)*pi*ec^2*sin((1/2)*x*pi)/(epsilon_0*m_e*(nu^2 + omega^2))'
-    expression_y = '-ec^2*(-0.2*pi*sin(y*pi)*sin(2*pi*t) + pi*cos(y*pi))/(epsilon_0*m_e*(nu^2 + omega^2))'
+    expression = '-0.4*pi*ec^2*cos(y*pi)*cos(2*pi*t)/(epsilon_0*m_e*(nu^2 + omega^2))'
   []
-  [dielectric_image_grad_fun]
-    type = ParsedVectorFunction
+  [d_dielectric_image_dt_fun]
+    type = ParsedFunction
     symbol_names =  'omega m_e ec nu epsilon_0'
     symbol_values = 'omega m_e ec nu epsilon_0'
-    expression_x = '0.5*pi*ec^2*nu*sin((1/2)*x*pi)/(epsilon_0*m_e*(nu^2*omega + omega^3))'
-    expression_y = '-1.0*ec^2*nu*(-0.2*pi*sin(y*pi)*sin(2*pi*t) + pi*cos(y*pi))/(epsilon_0*m_e*(nu^2*omega + omega^3))'
+    expression = '-0.4*pi*ec^2*nu*cos(y*pi)*cos(2*pi*t)/(epsilon_0*m_e*(nu^2*omega + omega^3))'
+  []
+
+  [d2_dielectric_real_dt2_fun]
+    type = ParsedFunction
+    symbol_names =  'omega m_e ec nu epsilon_0'
+    symbol_values = 'omega m_e ec nu epsilon_0'
+    expression = '0.8*pi^2*ec^2*sin(2*pi*t)*cos(y*pi)/(epsilon_0*m_e*(nu^2 + omega^2))'
+  []
+  [d2_dielectric_image_dt2_fun]
+    type = ParsedFunction
+    symbol_names =  'omega m_e ec nu epsilon_0'
+    symbol_values = 'omega m_e ec nu epsilon_0'
+    expression = '0.8*pi^2*ec^2*nu*sin(2*pi*t)*cos(y*pi)/(epsilon_0*m_e*(nu^2*omega + omega^3))'
   []
 []
 
@@ -285,15 +316,26 @@
     function = dielectric_image_fun
   [../]
 
-  [./dielectric_real_grad_Error]
-    type = ElementVectorL2Error
-    variable = dielectric_real_grad
-    function = dielectric_real_grad_fun
+  [./d_dielectric_real_dt_Error]
+    type = ElementL2Error
+    variable = d_dielectric_real_dt
+    function = d_dielectric_real_dt_fun
   [../]
-  [./dielectric_image_grad_Error]
-    type = ElementVectorL2Error
-    variable = dielectric_image_grad
-    function = dielectric_image_grad_fun
+  [./d_dielectric_image_dt_Error]
+    type = ElementL2Error
+    variable = d_dielectric_image_dt
+    function = d_dielectric_image_dt_fun
+  [../]
+
+  [./d2_dielectric_real_dt2_Error]
+    type = ElementL2Error
+    variable = d2_dielectric_real_dt2
+    function = d2_dielectric_real_dt2_fun
+  [../]
+  [./d2_dielectric_image_dt2_Error]
+    type = ElementL2Error
+    variable = d2_dielectric_image_dt2
+    function = d2_dielectric_image_dt2_fun
   [../]
 
   [./h]
@@ -324,7 +366,8 @@
 
   # dt = 0.01
 
-  dt = 0.005
+  dt = 0.25
+  #dt = 0.005
 
   # # dt = 0.008
   
@@ -337,12 +380,16 @@
   petsc_options_iname = '-pc_type -pc_factor_shift_type -pc_factor_shift_amount'
   petsc_options_value = 'lu NONZERO 1.e-10'
 
-  scheme = bdf2
-
   nl_abs_tol = 1e-13
+
+  # scheme = bdf2
+  [TimeIntegrator]
+    type = NewmarkBeta
+    inactive_tsteps = 10
+  []
 []
 
 [Outputs]
   csv = true
-  exodus = false
+  exodus = true
 []

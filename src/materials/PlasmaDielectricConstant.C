@@ -47,6 +47,9 @@ PlasmaDielectricConstant::computeQpProperties()
   Real omega_pe_const = std::sqrt(std::pow(_elementary_charge, 2) / (_eps_vacuum * _electron_mass));
   ADReal omega_pe = omega_pe_const * std::sqrt(std::exp(_em[_qp]));
 
+  Real omega_pe_const_sq = std::pow(_elementary_charge, 2) / (_eps_vacuum * _electron_mass);
+  ADReal omega_pe_sq = omega_pe_const * std::exp(_em[_qp]);
+
   mooseDoOnce(std::cout << "Elementary charge is " << _elementary_charge << "\n");
   mooseDoOnce(std::cout << "Vacuum electric permittivity is " << _eps_vacuum << "\n");
   mooseDoOnce(std::cout << "Electron mass is " << _electron_mass << "\n");
@@ -79,18 +82,31 @@ PlasmaDielectricConstant::computeQpProperties()
     ADReal lin_dot = _em_dot[_qp] * std::exp(_em[_qp]);
 
     // Calculate the first time derivative of the plasma dielectric constant
+
+    // _eps_r_real_dot[_qp] = -1.0 * std::pow(omega_pe_const, 2) * lin_dot /
+    //                        (std::pow(2 * _pi * _frequency, 2) + std::pow(_nu, 2));
     _eps_r_real_dot[_qp] = -1.0 * std::pow(omega_pe_const, 2) * lin_dot /
                            (std::pow(2 * _pi * _frequency, 2) + std::pow(_nu, 2));
 
+    // _eps_r_imag_dot[_qp] =
+    //     -1.0 * std::pow(omega_pe_const, 2) * _nu * lin_dot /
+    //     (std::pow(2 * _pi * _frequency, 3) + 2 * _pi * _frequency * std::pow(_nu, 2));
     _eps_r_imag_dot[_qp] =
         -1.0 * std::pow(omega_pe_const, 2) * _nu * lin_dot /
         (std::pow(2 * _pi * _frequency, 3) + 2 * _pi * _frequency * std::pow(_nu, 2));
 
     // Calculate the second time derivative of the linear electron density
+    // ADReal lin_dot_dot =
+    //     _em_dot_dot[_qp] * std::exp(_em[_qp]) + std::pow(_em_dot[_qp], 2) * std::exp(_em[_qp]);
     ADReal lin_dot_dot =
         _em_dot_dot[_qp] * std::exp(_em[_qp]) + std::pow(_em_dot[_qp], 2) * std::exp(_em[_qp]);
 
     // Calculate the second time derivative of the plasma dielectric constant
+    // _eps_r_real_dot_dot[_qp] = -1.0 * std::pow(omega_pe_const, 2) * lin_dot_dot /
+    //                            (std::pow(2 * _pi * _frequency, 2) + std::pow(_nu, 2));
+    // _eps_r_imag_dot_dot[_qp] =
+    //     -1.0 * std::pow(omega_pe_const, 2) * _nu * lin_dot_dot /
+    //     (std::pow(2 * _pi * _frequency, 3) + 2 * _pi * _frequency * std::pow(_nu, 2));
     _eps_r_real_dot_dot[_qp] = -1.0 * std::pow(omega_pe_const, 2) * lin_dot_dot /
                                (std::pow(2 * _pi * _frequency, 2) + std::pow(_nu, 2));
     _eps_r_imag_dot_dot[_qp] =

@@ -69,11 +69,11 @@
   [../]
 
   [./dielectric_real_grad]
-    family = LAGRANGE_VEC
+    family = MONOMIAL_VEC
     order = FIRST
   [../]
   [./dielectric_image_grad]
-    family = LAGRANGE_VEC
+    family = MONOMIAL_VEC
     order = FIRST
   [../]
 []
@@ -104,14 +104,14 @@
   [../]
 
   [./dielectric_real_grad]
-    type = VectorFunctionAux
+    type = ADVectorMaterialRealVectorValueAux
     variable = dielectric_real_grad
-    function = dielectric_real_grad_fun
+    property = plasma_dielectric_constant_real_grad
   [../]
   [./dielectric_image_grad]
-    type = VectorFunctionAux
+    type = ADVectorMaterialRealVectorValueAux
     variable = dielectric_image_grad
-    function = dielectric_image_grad_fun
+    property = plasma_dielectric_constant_imag_grad
   [../]
 []
 
