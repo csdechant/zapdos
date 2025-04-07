@@ -2,9 +2,9 @@
   [gmg]
     type = GeneratedMeshGenerator
     dim = 3
-    nx = 20
-    ny = 20
-    nz = 20
+    nx = 5
+    ny = 5
+    nz = 1
     elem_type = HEX20
     zmax = 0.001
   []
@@ -18,21 +18,20 @@
   [n]
     family = LAGRANGE
     order = FIRST
-    initial_condition = '-0.1'
   []
 []
 
 [Kernels]
-  [dummy_null]
-    type = TimeDerivativeLog
-    variable = n
-  []
-  [bracket_operation]
-    type = MatVelocityDiffusionProduct
-    variable = n
-    velocity = E_cross_drift
-    position_units = 1.0
-  []
+  # [dummy_null]
+  #   type = TimeDerivativeLog
+  #   variable = n
+  # []
+  # [density_vec_div_product_operation]
+  #   type = DensityMatVelocityDivergenceProduct
+  #   variable = n
+  #   velocity = parallel_velocity
+  #   position_units = 1.0
+  # []
   [body_force]
     type = BodyForce
     variable = n
@@ -45,12 +44,12 @@
     family = NEDELEC_ONE
     order = FIRST
   []
-  [potential]
+  [scalar_velocity]
     family = LAGRANGE
     order = FIRST
   []
 
-  [drift]
+  [parallel_velocity]
     family = MONOMIAL_VEC
     order = FIRST
   []
@@ -62,53 +61,42 @@
     variable = B_field
     function = B_field_fun
   []
-
-  [potential_calc]
+  [scalar_velocity_calc]
     type = FunctionAux
-    variable = potential
-    function = potential_fun
-  []
-
-  [drift_value]
-    type = ADVectorMaterialRealVectorValueAux
-    variable = drift
-    property = 'E_cross_drift'
+    variable = scalar_velocity
+    function = scalar_velocity_fun
   []
 []
 
 [Functions]
   [B_field_fun]
     type = ParsedVectorFunction
-    expression_x = '0'
-    expression_y = '0'
-    expression_z = '1'
+    expression_x = '2'
+    expression_y = '3'
+    expression_z = '4'
   []
-  [potential_fun]
+  [scalar_velocity_fun]
     type = ParsedFunction
-    expression = '(sin(pi*x)*(0.5*x - cos(7*t)*sin(3*x*x - 3*y)))'
+    expression = '(14*x + 13*y + 15*z )'
   []
 
   [body_force_fun]
     type = ParsedFunction
-    expression = '-(3.0*(2.0*x*cos(10*t)*cos(5*x^2 - 2*y) + 0.9)*sin(x*pi)*cos(7*t)*cos(3*x^2 - 3*y) - 0.4*(-pi*(0.5*x - sin(3*x^2 - 3*y)*cos(7*t))*cos(x*pi) - (-6*x*cos(7*t)*cos(3*x^2 - 3*y) + 0.5)*sin(x*pi))*cos(10*t)*cos(5*x^2 - 2*y) - 2.0*sin(10*t)*sin(5*x^2 - 2*y))'
+    expression = '-127*sqrt(29)*(0.9*x + 0.2*sin(5*x^2 - 2*z)*cos(10*t) + 0.9)/29 - 2.0*sin(10*t)*sin(5*x^2 - 2*z)'
   []
 
   [n_solution]
     type = ParsedFunction
-    expression = 'log(0.9 + 0.9*x + 0.2*cos(10*t)*sin(5*x*x - 2*y))'
+    expression = 'log(0.9*x + 0.2*sin(5*x^2 - 2*z)*cos(10*t) + 0.9)'
   []
 []
 
 [Materials]
   [drift]
-    type = MagneticPerpVelocity
+    type = MagneticParallelVelocity
     magnetic_field = B_field
-    field_property_name = field_solver_interface_property
-  []
-  [field_solver]
-    type = FieldSolverMaterial
-    potential = potential
-    solver = electrostatic
+    scalar_parallel_vel = scalar_velocity
+    output_properties = 'div_parallel_velocity'
   []
 []
 
@@ -151,8 +139,7 @@
   end_time = 1
   dt = 0.01
 
-  automatic_scaling = true
-  compute_scaling_once = false
+  # automatic_scaling = true
   petsc_options = '-snes_converged_reason -snes_linesearch_monitor'
   solve_type = NEWTON
   line_search = none

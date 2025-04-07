@@ -28,7 +28,11 @@ FieldSolverMaterial::FieldSolverMaterial(const InputParameters & parameters)
     _grad_potential(isCoupled("potential") ? adCoupledGradient("potential") : _ad_grad_zero),
     _electric_field(isCoupled("electric_field") ? adCoupledVectorValue("electric_field")
                                                 : _ad_grad_zero),
+    _electric_field_curl(isCoupled("electric_field") ? adCoupledCurl("electric_field")
+                                                     : _ad_grad_zero),
     _field(declareADProperty<RealVectorValue>(getParam<std::string>("property_name"))),
+    _field_curl(
+        declareADProperty<RealVectorValue>(getParam<std::string>("property_name") + "_curl")),
     _mode(getParam<MooseEnum>("solver"))
 {
   enum ComparisonEnum
@@ -68,10 +72,12 @@ FieldSolverMaterial::computeQpProperties()
 {
   if (isParamValid("potential"))
   {
+    ADRealVectorValue Zero(0, 0, 0);
     _field[_qp] = -_grad_potential[_qp];
   }
   else if (isParamValid("electric_field"))
   {
     _field[_qp] = _electric_field[_qp];
+    _field_curl[_qp] = _electric_field_curl[_qp];
   }
 }

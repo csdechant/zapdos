@@ -24,15 +24,22 @@ public:
   MagneticPerpVelocity(const InputParameters & parameters);
 
 protected:
-  virtual void computeQpProperties() override;
+  // virtual void computeQpProperties() override;
 
   /// Coupled magnetic field variable
   const ADVectorVariableValue & _magnetic_field;
+  /// Coupled curl of the magnetic field variable
+  const ADVectorVariableCurl & _curl_magnetic_field;
   /// Coupled electric field variable
   const ADMaterialProperty<RealVectorValue> & _electric_field;
+  /// Coupled curl of the electric field variable
+  const ADMaterialProperty<RealVectorValue> & _curl_electric_field;
 
   /// E X B (electric field cross magnetic field) drift velocity
   ADMaterialProperty<RealVectorValue> & _E_cross_drift;
+
+  /// DiverE X B (electric field cross magnetic field) drift velocity
+  ADMaterialProperty<Real> & _div_E_cross_drift;
 
   /*
   /// Gradient of coupled pressure gradient
