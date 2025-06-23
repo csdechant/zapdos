@@ -1,0 +1,23 @@
+[Tests]
+  [perpendicular_diffusion_exodiff]
+    type = 'Exodiff'
+    input = 'perpendicular_diffusion.i'
+    exodiff = 'perpendicular_diffusion_out.e'
+    requirement = 'The system shall be compute the magnetic perpendicular diffusion of a density cased in logarithmic form.'
+    design = ''
+    issues = ''
+  []
+  [perpendicular_diffusion_convergence_csv]
+    type = CSVDiff
+    command = perpendicular-diffusion-convergence.py
+    csvdiff = 'perpendicular_diffusion.csv'
+    requirement = 'The system shall be able to perform a convergence analysis for the magnetic perpendicular diffusion of a density cased in logarithmic form.'
+    design = ''
+    issues = ''
+    heavy = True
+    recover = false
+    valgrind = none
+    method = opt
+    required_python_packages = 'sympy os'
+  []
+[]

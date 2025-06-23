@@ -23,9 +23,13 @@ protected:
 
   /// Coupled electric field variable
   const ADVectorVariableValue & _electric_field;
+  /// Curl of coupled electric field variable
+  const ADVectorVariableCurl & _curl_electric_field;
 
   /// Electric field material property
   ADMaterialProperty<RealVectorValue> & _field;
+  /// Curl of electric field material property
+  ADMaterialProperty<RealVectorValue> & _curl_field;
 
   /// Variable that holds user solver setting (electrostatic or electromagnetic)
   const MooseEnum _mode;

@@ -1,0 +1,67 @@
+[Tests]
+  [scalarLog_divergenceMatVelocity_product_exodiff]
+    type = 'Exodiff'
+    input = 'scalarLog_divergenceMatVelocity_product.i'
+    exodiff = 'scalarLog_divergenceMatVelocity_product_out.e'
+    requirement = 'The system shall be compute the product of a scalar variable and the divergence of a material vector property.'
+    design = ''
+    issues = ''
+  []
+  [scalarLog_divergenceMatVelocity_product_convergence_csv]
+    type = CSVDiff
+    command = scalarLog-divergenceMatVelocity-product-convergence.py
+    csvdiff = 'scalarLog_divergenceMatVelocity_product.csv'
+    requirement = 'The system shall be able to perform a convergence analysis for the product of a scalar variable and the divergence of a material vector property.'
+    design = ''
+    issues = ''
+    heavy = True
+    recover = false
+    valgrind = none
+    method = opt
+    required_python_packages = 'sympy os'
+  []
+
+  [matVector_gradentScalarLog_product_exodiff]
+    type = 'Exodiff'
+    input = 'matVector_gradentScalarLog_product.i'
+    exodiff = 'matVector_gradentScalarLog_product_out.e'
+    requirement = 'The system shall be compute the product of a material vector property and the gradient of a scalar variable.'
+    design = ''
+    issues = ''
+  []
+  [matVector_gradentScalarLog_product_convergence_csv]
+    type = CSVDiff
+    command = matVector-gradentScalarLog-product-convergence.py
+    csvdiff = 'matVector_gradentScalarLog_product.csv'
+    requirement = 'The system shall be able to perform a convergence analysis for the product of a material vector property and the gradient of a scalar variable.'
+    design = ''
+    issues = ''
+    heavy = True
+    recover = false
+    valgrind = none
+    method = opt
+    required_python_packages = 'sympy os'
+  []
+
+  [divergence_of_flux_exodiff]
+    type = 'Exodiff'
+    input = 'divergence_of_flux.i'
+    exodiff = 'divergence_of_flux_out.e'
+    requirement = 'The system shall be compute the divergence of a flux, which is defined as a vector times a scalar variable.'
+    design = ''
+    issues = ''
+  []
+  [divergence_of_flux_convergence_csv]
+    type = CSVDiff
+    command = diamagnetic-velocity-convergence.py
+    csvdiff = 'divergence-of-flux-convergence.csv'
+    requirement = 'The system shall be able to perform a convergence analysis for the divergence of a flux, which is defined as a vector times a scalar variable.'
+    design = ''
+    issues = ''
+    heavy = True
+    recover = false
+    valgrind = none
+    method = opt
+    required_python_packages = 'sympy os'
+  []
+[]

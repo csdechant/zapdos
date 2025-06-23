@@ -44,6 +44,7 @@ Extensions:
                 MOOSE Discussions Forum: https://github.com/idaholab/moose/discussions
                 MOOSE Homepage: https://mooseframework.inl.gov/
                 MOOSE Developer Information: development/moose_developer_info.md
+            Equation Notes: fusion.md
     MooseDocs.extensions.template:
         active: true
     MooseDocs.extensions.appsyntax:

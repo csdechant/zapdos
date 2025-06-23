@@ -1,0 +1,23 @@
+[Tests]
+  [diamagnetic_velocity_exodiff]
+    type = 'Exodiff'
+    input = 'diamagnetic_velocity.i'
+    exodiff = 'diamagnetic_velocity_out.e'
+    requirement = 'The system shall be compute the diamagnetic velocity as a material property.'
+    design = ''
+    issues = ''
+  []
+  [diamagnetic_velocity_convergence_csv]
+    type = CSVDiff
+    command = diamagnetic-velocity-convergence.py
+    csvdiff = 'diamagnetic_velocity.csv'
+    requirement = 'The system shall be able to perform a convergence analysis for the diamagnetic velocity and its divergence term.'
+    design = ''
+    issues = ''
+    heavy = True
+    recover = false
+    valgrind = none
+    method = opt
+    required_python_packages = 'sympy os'
+  []
+[]

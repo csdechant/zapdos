@@ -1,0 +1,23 @@
+[Tests]
+  [EcrossB_velocity_exodiff]
+    type = 'Exodiff'
+    input = 'EcrossB_velocity.i'
+    exodiff = 'EcrossB_velocity_out.e'
+    requirement = 'The system shall be compute the E x B velocity as a material property.'
+    design = ''
+    issues = ''
+  []
+  [EcrossB_velocity_convergence_csv]
+    type = CSVDiff
+    command = EcrossB-velocity-convergence.py
+    csvdiff = 'EcrossB_velocity.csv'
+    requirement = 'The system shall be able to perform a convergence analysis for the E x B velocity and its divergence term.'
+    design = ''
+    issues = ''
+    heavy = True
+    recover = false
+    valgrind = none
+    method = opt
+    required_python_packages = 'sympy os'
+  []
+[]

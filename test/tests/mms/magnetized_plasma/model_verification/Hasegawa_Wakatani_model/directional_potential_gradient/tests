@@ -1,0 +1,23 @@
+[Tests]
+  [directional_potential_gradient_exodiff]
+    type = 'Exodiff'
+    input = 'adiabatic_term.i'
+    exodiff = 'adiabatic_term_out.e'
+    requirement = 'The system shall be compute the directional potential gradient as a source term for the a diffusion problem.'
+    design = ''
+    issues = ''
+  []
+  [directional_potential_gradient_convergence_csv]
+    type = CSVDiff
+    command = adiabatic_term.py
+    csvdiff = 'adiabatic_term.csv'
+    requirement = 'The system shall be able to perform a convergence analysis for the directional potential gradient as a source term for the a diffusion problem.'
+    design = ''
+    issues = ''
+    heavy = True
+    recover = false
+    valgrind = none
+    method = opt
+    required_python_packages = 'sympy os'
+  []
+[]
