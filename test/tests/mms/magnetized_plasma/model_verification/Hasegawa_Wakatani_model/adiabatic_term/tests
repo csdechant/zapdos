@@ -9,7 +9,7 @@
   []
   [adiabatic_term_convergence_csv]
     type = CSVDiff
-    command = adiabatic_term.py
+    command = adiabatic-term-convergence.py
     csvdiff = 'adiabatic_term.csv'
     requirement = 'The system shall be able to perform a convergence analysis for the adiabatic term for the Hasegawa Wakatani model.'
     design = ''

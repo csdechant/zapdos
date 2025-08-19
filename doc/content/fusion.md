@@ -364,3 +364,7 @@ The manufactured solutions used were:
        style=width:50%;margin-bottom:2%;margin-left:auto;margin-right:auto
        id=ver-2D-Hasegawa-Wakatani
        caption=Spatial convergence plot the density ($n$), vorticity ($\omega$), and potential ($\phi$) solving with the Hasegawa-Wakatani. Ideal convergence slope for first order variable types is 2.
+
+## Verification of Second Plasma Edge Model: Reduced MHD
+
+The second model of choice is the reduced magnetohydrodynamics (MHD) equations.

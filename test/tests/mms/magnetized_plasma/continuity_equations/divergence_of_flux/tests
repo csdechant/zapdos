@@ -53,8 +53,8 @@
   []
   [divergence_of_flux_convergence_csv]
     type = CSVDiff
-    command = diamagnetic-velocity-convergence.py
-    csvdiff = 'divergence-of-flux-convergence.csv'
+    command = divergence-of-flux-convergence.py
+    csvdiff = 'divergence_of_flux.csv'
     requirement = 'The system shall be able to perform a convergence analysis for the divergence of a flux, which is defined as a vector times a scalar variable.'
     design = ''
     issues = ''
