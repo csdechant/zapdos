@@ -3,29 +3,28 @@ This is a new, but unfinished webpage for the Zapdos website. A PR with this pag
 
 # Verification & Validation (V&V)
 
-Add a description of how cool V&V is.
+Zapdos undergoes an extensive verification and validation process when including new additions. As defined by the American Institute of Aeronautics and Astronautics (AIAA):
 
-Below at verification, benchmarking, and validation. The suggested nomenclature is as follows:
+- Verification is the process of determining that a model implementation accurately represents the developer’s conceptual description of, and solution to, the model.
+- Validation is the process of determining the degree to which a model accurately represents the real world—from the perspective of the model’s intended uses.
 
-Abbreviations:
+In addition to verification and validation, Zapdos has undergone code-to-code comparison, commonly referred to as "benchmarking".
+
+Below are the current verification, benchmarking, and validation cases of Zapdos, which observes the following categorization nomenclature:
+
+`(Testing Category).(Application Category).(Case Number).(Sub-case Number)`
+
+`Testing Category` consist of the following abbreviations:
 
 - ver: verification
 - ben: benchmarking (code-to-code comparison)
 - val: validation
 
-First Number Set:
+`Application Category` consist of a numerical syntax:
 
 - 1: Industrial Plasmas (e.g. low-temperature plasmas for microchip manufacturing, biomedical, agriculture, etc.)
 - 2: Magnetic Fusion Plasmas (strictly magnetically confident fusion plasmas)
 - 3: Space Plasmas (e.g. astrophysics and ion propulsion)
-
-Second Number Set:
-
-- The listing order of the cases
-
-Third Number Set:
-
-- The listing order of the sub-cases
 
 # List of verification cases
 

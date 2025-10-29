@@ -1,8 +1,8 @@
 [Tests]
   [tutorial01-Diffusion]
     type = Exodiff
-    input = 'diffusion-only.i'
-    exodiff = 'diffusion-only_out.e'
+    input = 'ambipolar-diffusion.i'
+    exodiff = 'ambipolar-diffusion_out.e'
     group = 'tutorial'
   []
 []
