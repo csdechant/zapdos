@@ -23,7 +23,7 @@ MOOSE's [electromagnetics module](https://mooseframework.inl.gov/modules/electro
 
 Click the link in the section title to visit the GitHub page about the progress of merging this capability.
 
-## [Braginskii Model](https://github.com/shannon-lab/zapdos/issues/294)
+## [Braginskii Model](braginskii_model.md)
 
 !style halign=left
 The Braginskii fluid model is commonly used to simulate the edge region of the plasma for tokamak fusion devices (referenced in [!cite](dudson2016verification), [!cite](dull2024introducing), and [!cite](wiesen2015new)). Current efforts are focused on incorporating the Braginskii model into Zapdos, with initial merged capability coming soon.
