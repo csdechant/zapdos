@@ -38,5 +38,5 @@ CoeffParallelDiffusion::CoeffParallelDiffusion(const InputParameters & parameter
 ADReal
 CoeffParallelDiffusion::computeQpResidual()
 {
-  return _test[_i][_qp] * _coeff[_qp] * _vector[_qp] * _grad_v[_qp] * std::exp(_v[_qp]) * _r_units;
+  return _test[_i][_qp] * _coeff[_qp] * _vector[_qp] * _grad_v[_qp] * exp(_v[_qp]) * _r_units;
 }

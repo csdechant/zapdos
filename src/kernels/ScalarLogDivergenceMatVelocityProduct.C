@@ -28,12 +28,12 @@ ScalarLogDivergenceMatVelocityProduct::ScalarLogDivergenceMatVelocityProduct(
     const InputParameters & parameters)
   : ADKernel(parameters),
     _r_units(1. / getParam<Real>("position_units")),
-    _div_vector(getADMaterialProperty<Real>("div_"+getParam<std::string>("mat_vector")))
+    _div_vector(getADMaterialProperty<Real>("div_" + getParam<std::string>("mat_vector")))
 {
 }
 
 ADReal
 ScalarLogDivergenceMatVelocityProduct::computeQpResidual()
 {
-  return _test[_i][_qp] * std::exp(_u[_qp]) * _div_vector[_qp] * _r_units;
+  return _test[_i][_qp] * exp(_u[_qp]) * _div_vector[_qp] * _r_units;
 }

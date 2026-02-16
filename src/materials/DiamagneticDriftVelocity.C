@@ -44,16 +44,15 @@ DiamagneticDriftVelocity::DiamagneticDriftVelocity(const InputParameters & param
 void
 DiamagneticDriftVelocity::computeQpProperties()
 {
-  _diamagnetic_drift[_qp] =
-      _magnetic_unit_vector[_qp].cross(_grad_pressure[_qp]) /
-      (_sgn[_qp] * _e[_qp] * std::exp(_density[_qp]) * _mag_magnetic_field[_qp]);
+  _diamagnetic_drift[_qp] = _magnetic_unit_vector[_qp].cross(_grad_pressure[_qp]) /
+                            (_sgn[_qp] * _e[_qp] * exp(_density[_qp]) * _mag_magnetic_field[_qp]);
 
   _div_diamagnetic_drift[_qp] =
-      -(_grad_density[_qp] * std::exp(_density[_qp]) /
-            (std::exp(_density[_qp]) * std::exp(_density[_qp]) * _mag_magnetic_field[_qp]) +
+      -(_grad_density[_qp] * exp(_density[_qp]) /
+            (exp(_density[_qp]) * exp(_density[_qp]) * _mag_magnetic_field[_qp]) +
         _grad_mag_magnetic_field[_qp] /
-            (std::exp(_density[_qp]) * _mag_magnetic_field[_qp] * _mag_magnetic_field[_qp])) /
+            (exp(_density[_qp]) * _mag_magnetic_field[_qp] * _mag_magnetic_field[_qp])) /
           (_sgn[_qp] * _e[_qp]) * _magnetic_unit_vector[_qp].cross(_grad_pressure[_qp]) +
       _grad_pressure[_qp] * _curl_magnetic_unit_vector[_qp] /
-          (_sgn[_qp] * _e[_qp] * std::exp(_density[_qp]) * _mag_magnetic_field[_qp]);
+          (_sgn[_qp] * _e[_qp] * exp(_density[_qp]) * _mag_magnetic_field[_qp]);
 }

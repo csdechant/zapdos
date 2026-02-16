@@ -41,6 +41,7 @@ CoeffPerpendicularDiffusion::computeQpResidual()
 {
 
   return -_perp_diffusivity[_qp] * -_grad_test[_i][_qp] *
-         (std::exp(_u[_qp]) * _grad_u[_qp] * _r_units -
-          _magnetic_unit_vector[_qp] * (_magnetic_unit_vector[_qp] * std::exp(_u[_qp]) * _grad_u[_qp] * _r_units));
+         (exp(_u[_qp]) * _grad_u[_qp] * _r_units -
+          _magnetic_unit_vector[_qp] *
+              (_magnetic_unit_vector[_qp] * exp(_u[_qp]) * _grad_u[_qp] * _r_units));
 }

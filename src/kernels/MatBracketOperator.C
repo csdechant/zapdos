@@ -43,5 +43,5 @@ MatBracketOperator::computeQpResidual()
 {
 
   return _coeff[_qp] * _test[_i][_qp] * _magnetic_vector[_qp] * _grad_v[_qp].cross(_grad_w[_qp]) *
-         std::exp(_w[_qp]);
+         exp(_w[_qp]);
 }

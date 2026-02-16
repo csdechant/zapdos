@@ -44,5 +44,5 @@ MatCurvatureOperator::computeQpResidual()
   return _coeff[_qp] * _test[_i][_qp] *
          (_curl_magnetic_vector[_qp] +
           _magnetic_vector[_qp].cross(_grad_mag_magnetic_field[_qp]) / _mag_magnetic_field[_qp]) *
-         _grad_v[_qp] * std::exp(_v[_qp]) / 2;
+         _grad_v[_qp] * exp(_v[_qp]) / 2;
 }

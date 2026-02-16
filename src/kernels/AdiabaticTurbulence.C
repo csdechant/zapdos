@@ -17,11 +17,10 @@ AdiabaticTurbulence::validParams()
 {
   InputParameters params = ADKernel::validParams();
   params.addRequiredCoupledVar("density", "The density in logarithmic form.");
-  params.addRequiredCoupledVar("potential",
-                               "The potential.");
-  params.addRequiredParam<std::string>("adiabaticity", "The adiabaticity coefficient of the density species.");
-  params.addClassDescription(
-      "The adiabatic term for the Hasegawa-Wakatani model");
+  params.addRequiredCoupledVar("potential", "The potential.");
+  params.addRequiredParam<std::string>("adiabaticity",
+                                       "The adiabaticity coefficient of the density species.");
+  params.addClassDescription("The adiabatic term for the Hasegawa-Wakatani model");
   return params;
 }
 
@@ -36,5 +35,5 @@ AdiabaticTurbulence::AdiabaticTurbulence(const InputParameters & parameters)
 ADReal
 AdiabaticTurbulence::computeQpResidual()
 {
-  return -_test[_i][_qp] * _adiabaticity[_qp] * ( _potential[_qp] - std::exp(_density[_qp]) );
+  return -_test[_i][_qp] * _adiabaticity[_qp] * (_potential[_qp] - exp(_density[_qp]));
 }

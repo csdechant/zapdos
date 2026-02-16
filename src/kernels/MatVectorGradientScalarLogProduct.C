@@ -17,23 +17,23 @@ MatVectorGradientScalarLogProduct::validParams()
 {
   InputParameters params = ADKernel::validParams();
   params.addParam<Real>("position_units", 1.0, "Units of position.");
-  params.addRequiredParam<std::string>("mat_vector",
-                               "Name of the vector material property.");
-  params.addClassDescription("Contributes the product of the gradient of a logarithmic case variable and a "
-                             "vector (the vector is supplied as a material property)");
+  params.addRequiredParam<std::string>("mat_vector", "Name of the vector material property.");
+  params.addClassDescription(
+      "Contributes the product of the gradient of a logarithmic case variable and a "
+      "vector (the vector is supplied as a material property)");
   return params;
 }
 
-MatVectorGradientScalarLogProduct::MatVectorGradientScalarLogProduct(const InputParameters & parameters)
+MatVectorGradientScalarLogProduct::MatVectorGradientScalarLogProduct(
+    const InputParameters & parameters)
   : ADKernel(parameters),
     _r_units(1. / getParam<Real>("position_units")),
-    _vector(
-        getADMaterialProperty<RealVectorValue>(getParam<std::string>("mat_vector")))
+    _vector(getADMaterialProperty<RealVectorValue>(getParam<std::string>("mat_vector")))
 {
 }
 
 ADReal
 MatVectorGradientScalarLogProduct::computeQpResidual()
 {
-  return _test[_i][_qp] * _vector[_qp] * std::exp(_u[_qp]) * _grad_u[_qp] * _r_units;
+  return _test[_i][_qp] * _vector[_qp] * exp(_u[_qp]) * _grad_u[_qp] * _r_units;
 }
