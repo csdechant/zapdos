@@ -1,6 +1,8 @@
+
 #include "DependentCollisionFreq.h"
 #include "MooseUtils.h"
 #include "PlasmaEnums.h"
+#include "Zapdos.h"
 
 #include "MooseVariable.h"
 
@@ -28,6 +30,11 @@ DependentCollisionFreq ::validParams()
                              interpolation,
                              "Whether to use mean energy or reduce Efield to interpolate collision "
                              "frequency (default = mean_energy).");
+  params.addCoupledVar("T_gas", 300, "The background gas temperature in Kelvin.");
+  params.addCoupledVar(
+      "p_gas",
+      1.01e5,
+      "The background gas pressure in Pascals (defaulted to 1 standard atmosphere).");
   params.addClassDescription(
       "Material property for electron momentum-transfer collision frequency");
   return params;
@@ -46,9 +53,9 @@ DependentCollisionFreq::DependentCollisionFreq(const InputParameters & parameter
         (_interp == LTP::REDUDE_EFIELD)
             ? getADMaterialProperty<RealVectorValue>(getParam<std::string>("field_property_name"))
             : getGenericZeroMaterialProperty<RealVectorValue, true>()),
-    _k_boltz(getMaterialProperty<Real>("k_boltz")),
-    _T_gas(getMaterialProperty<Real>("T_gas")),
-    _p_gas(getMaterialProperty<Real>("p_gas")),
+
+    _T_gas(coupledValue("T_gas")),
+    _p_gas(coupledValue("p_gas")),
     _frequency(getParam<Real>("driving_frequency")),
     _pi(libMesh::pi),
     _delta(getParam<Real>("delta"))
@@ -81,22 +88,25 @@ DependentCollisionFreq::DependentCollisionFreq(const InputParameters & parameter
 void
 DependentCollisionFreq::computeQpProperties()
 {
-  Real _N_gas = _p_gas[_qp] / (_k_boltz[_qp] * _T_gas[_qp]);
+  using std::exp;
+  using std::pow;
+
+  Real _N_gas = _p_gas[_qp] / (ZAPDOS_CONSTANTS::k_boltz * _T_gas[_qp]);
 
   if (_interp == LTP::MEAN_ENERGY)
   {
     _nu_neutral[_qp].value() =
-        _nu_interpolation.sample(std::exp(_mean_en[_qp].value() - _em[_qp].value())) * _N_gas +
+        _nu_interpolation.sample(exp(_mean_en[_qp].value() - _em[_qp].value())) * _N_gas +
         (2 * _pi * _frequency) / _delta;
 
     _nu_neutral[_qp].derivatives() =
-        _nu_interpolation.sampleDerivative(std::exp(_mean_en[_qp].value() - _em[_qp].value())) *
-        _N_gas * std::exp(_mean_en[_qp].value() - _em[_qp].value()) *
+        _nu_interpolation.sampleDerivative(exp(_mean_en[_qp].value() - _em[_qp].value())) * _N_gas *
+        exp(_mean_en[_qp].value() - _em[_qp].value()) *
         (_mean_en[_qp].derivatives() - _em[_qp].derivatives());
 
     _grad_nu_neutral[_qp] =
-        _nu_interpolation.sampleDerivative(std::exp(_mean_en[_qp].value() - _em[_qp].value())) *
-        _N_gas * std::exp(_mean_en[_qp] - _em[_qp]) * (_grad_mean_en[_qp] - _grad_em[_qp]);
+        _nu_interpolation.sampleDerivative(exp(_mean_en[_qp].value() - _em[_qp].value())) * _N_gas *
+        exp(_mean_en[_qp] - _em[_qp]) * (_grad_mean_en[_qp] - _grad_em[_qp]);
 
     // Safeguard agains zero values resulting from extrapolation
     if (_nu_neutral[_qp].value() < 0)
@@ -111,17 +121,16 @@ DependentCollisionFreq::computeQpProperties()
   {
     Real Td = _N_gas * 1e-21;
 
-    _nu_neutral[_qp] =
-        _nu_interpolation.sample(std::sqrt(std::pow(_electric_field[_qp](0).value(), 2) +
-                                           std::pow(_electric_field[_qp](1).value(), 2) +
-                                           std::pow(_electric_field[_qp](2).value(), 2)) /
-                                 Td) *
-        _N_gas;
+    _nu_neutral[_qp] = _nu_interpolation.sample(std::sqrt(pow(_electric_field[_qp](0).value(), 2) +
+                                                          pow(_electric_field[_qp](1).value(), 2) +
+                                                          pow(_electric_field[_qp](2).value(), 2)) /
+                                                Td) *
+                       _N_gas;
 
     _grad_nu_neutral[_qp] =
-        _nu_interpolation.sampleDerivative(std::sqrt(std::pow(_electric_field[_qp](0).value(), 2) +
-                                                     std::pow(_electric_field[_qp](1).value(), 2) +
-                                                     std::pow(_electric_field[_qp](2).value(), 2)) /
+        _nu_interpolation.sampleDerivative(std::sqrt(pow(_electric_field[_qp](0).value(), 2) +
+                                                     pow(_electric_field[_qp](1).value(), 2) +
+                                                     pow(_electric_field[_qp](2).value(), 2)) /
                                            Td) *
         _N_gas;
   }

@@ -66,12 +66,10 @@ protected:
   const ADVariableValue & _em_dot;
   /// Electron density second time derivative
   const ADVariableValue & _em_dot_dot;
-  /// Avogadro's number
-  const MaterialProperty<Real> & _N_A;
   /// Value of conductivity coefficient, real component
   ADMaterialProperty<Real> & _sigma_pe_real;
   /// Value of conductivity coefficient, imaginary component
   ADMaterialProperty<Real> & _sigma_pe_imag;
-  /// Variable that holds user coefficient type (relative or absolute)
-  const MooseEnum _coeff_type;
+  // /// Variable that holds user coefficient type (relative or absolute)
+  // const MooseEnum _coeff_type;
 };

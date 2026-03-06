@@ -280,9 +280,14 @@
 
 [Materials]
   [Plasma_dielectric]
-    type = PlasmaDielectricConstant
+    # type = PlasmaDielectricConstant
+    # driving_frequency = 6.207
+    # electron_neutral_collision_frequency = 6.525
+    # electrons = em
+    type = PlasmaEMProperties
     driving_frequency = 6.207
     electron_neutral_collision_frequency = 6.525
+    electron_neutral_collision_frequency_gradient = 0.0
     electrons = em
   []
   [field_solver]

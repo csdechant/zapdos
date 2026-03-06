@@ -44,12 +44,11 @@ protected:
   const ADVariableGradient & _grad_mean_en;
   /// Electric field vector variable
   const ADMaterialProperty<RealVectorValue> & _electric_field;
-  /// Boltzmann constant
-  const MaterialProperty<Real> & _k_boltz;
-  /// Neutral gas temperature
-  const MaterialProperty<Real> & _T_gas;
-  /// Neutral gas pressure
-  const MaterialProperty<Real> & _p_gas;
+
+  /// Coupled background gas temperature variable
+  const VariableValue & _T_gas;
+  /// Coupled background gas pressure variable
+  const VariableValue & _p_gas;
   /// Drive frequency of the system
   const Real & _frequency;
   /// Constant of pi
