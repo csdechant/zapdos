@@ -36,11 +36,11 @@ Where $D$ is a constant diffusion coefficient, $n_i$ is the species density, and
 
 ### Explore what happens as the diffusion coefficient is varied.
 
-!listing tutorial/tutorial01-Diffusion/diffusion-only.i block=Materials/gas_species_0
+!listing tutorial/tutorial01-Diffusion/ambipolar-diffusion.i block=Materials/gas_species_0
 
 ### Explore what happens as the reaction rate is varied.
 
-!listing tutorial/tutorial01-Diffusion/diffusion-only.i block=Materials/FirstOrder_Reaction
+!listing tutorial/tutorial01-Diffusion/ambipolar-diffusion.i block=Materials/FirstOrder_Reaction
 
 !---
 

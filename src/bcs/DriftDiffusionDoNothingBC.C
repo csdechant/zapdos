@@ -35,27 +35,23 @@ DriftDiffusionDoNothingBC::DriftDiffusionDoNothingBC(const InputParameters & par
 
     _r_units(1. / getParam<Real>("position_units")),
 
-    _mu(getParam<bool>("use_material_props") ? getADMaterialProperty<Real>("mu" + _var.name())
-                                             : _user_mu),
-    _sign(getParam<bool>("use_material_props") ? getMaterialProperty<Real>("sgn" + _var.name())
-                                               : _user_sign),
-    _diffusivity(getParam<bool>("use_material_props")
-                     ? getADMaterialProperty<Real>("diff" + _var.name())
-                     : _user_diff),
+    _mu(getADMaterialProperty<Real>("mu" + _var.name())),
+    _sign(getMaterialProperty<Real>("sgn" + _var.name())),
+    _diffusivity(getADMaterialProperty<Real>("diff" + _var.name())),
 
     _electric_field(
         getADMaterialProperty<RealVectorValue>(getParam<std::string>("field_property_name")))
 {
-  auto max_qps = _fe_problem.getMaxQps();
-  _user_diff.resize(max_qps);
-  _user_mu.resize(max_qps);
-  _user_sign.resize(max_qps);
-  for (decltype(max_qps) qp = 0; qp < max_qps; ++qp)
-  {
-    _user_diff[qp] = getParam<Real>("diff");
-    _user_mu[qp] = getParam<Real>("mu");
-    _user_sign[qp] = getParam<Real>("sign");
-  }
+  // auto max_qps = _fe_problem.getMaxQps();
+  // _user_diff.resize(max_qps);
+  // _user_mu.resize(max_qps);
+  // _user_sign.resize(max_qps);
+  // for (decltype(max_qps) qp = 0; qp < max_qps; ++qp)
+  // {
+  //   _user_diff[qp] = getParam<Real>("diff");
+  //   _user_mu[qp] = getParam<Real>("mu");
+  //   _user_sign[qp] = getParam<Real>("sign");
+  // }
 }
 
 ADReal

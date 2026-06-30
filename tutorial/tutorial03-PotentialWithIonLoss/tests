@@ -1,8 +1,8 @@
 [Tests]
   [tutorial03-PotentialWithIonLoss]
     type = Exodiff
-    input = 'ion-loss-for-IonOnlyPlasma.i'
-    exodiff = 'ion-loss-for-IonOnlyPlasma_out.e'
+    input = 'potential-with-ion-drain.i'
+    exodiff = 'potential-with-ion-drain_out.e'
     group = 'tutorial'
   []
 []
